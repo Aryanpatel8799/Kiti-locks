@@ -26,10 +26,8 @@ export interface IOrder extends Document {
     | "confirmed"
     | "processing"
     | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  paymentStatus: "pending" | "paid" | "failed" | "refunded";
+    | "delivered";
+  paymentStatus: "pending" | "paid" | "failed";
   paymentMethod: string;
   paymentIntentId: string;
   // Razorpay specific fields
@@ -42,8 +40,11 @@ export interface IOrder extends Document {
   billingAddress: IAddress;
   notes?: string;
   trackingNumber?: string;
+  trackingUrl?: string;
+  estimatedDelivery?: Date;
   shippedAt?: Date;
   deliveredAt?: Date;
+  // Removed cancellation and refund fields per user request
   createdAt: Date;
   updatedAt: Date;
 }
@@ -90,14 +91,12 @@ const orderSchema = new Schema<IOrder>(
         "processing",
         "shipped",
         "delivered",
-        "cancelled",
-        "refunded",
       ],
       default: "pending",
     },
     paymentStatus: {
       type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
+      enum: ["pending", "paid", "failed"],
       default: "pending",
     },
     paymentMethod: { type: String, required: true },
@@ -112,6 +111,8 @@ const orderSchema = new Schema<IOrder>(
     billingAddress: { type: addressSchema, required: true },
     notes: { type: String, trim: true },
     trackingNumber: { type: String, trim: true },
+    trackingUrl: { type: String, trim: true },
+    estimatedDelivery: { type: Date },
     shippedAt: { type: Date },
     deliveredAt: { type: Date },
   },

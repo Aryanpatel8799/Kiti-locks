@@ -256,7 +256,7 @@ router.put(
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { orderId } = req.params;
-      const { status } = req.body;
+      const { status, trackingNumber, trackingUrl, estimatedDelivery, notes } = req.body;
 
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });
@@ -269,8 +269,6 @@ router.put(
         "processing",
         "shipped",
         "delivered",
-        "cancelled",
-        "refunded",
       ];
 
       if (!validStatuses.includes(status)) {
@@ -278,13 +276,19 @@ router.put(
         return;
       }
 
+      const updateData: any = {
+        status,
+        ...(status === "shipped" && { shippedAt: new Date() }),
+        ...(status === "delivered" && { deliveredAt: new Date() }),
+        ...(trackingNumber && { trackingNumber }),
+        ...(trackingUrl && { trackingUrl }),
+        ...(estimatedDelivery && { estimatedDelivery: new Date(estimatedDelivery) }),
+        ...(notes && { notes }),
+      };
+
       const order = await Order.findByIdAndUpdate(
         orderId,
-        {
-          status,
-          ...(status === "shipped" && { shippedAt: new Date() }),
-          ...(status === "delivered" && { deliveredAt: new Date() }),
-        },
+        updateData,
         { new: true },
       ).populate("user", "name email");
 
@@ -297,7 +301,7 @@ router.put(
       try {
         if (order.user && (status === "shipped" || status === "delivered")) {
           const emailData = {
-            orderId: order._id.toString(),
+            orderId: order.orderNumber,
             customerName: (order.user as any).name || "Customer",
             customerEmail: (order.user as any).email,
             items: order.items.map((item: any) => ({
@@ -305,8 +309,10 @@ router.put(
               quantity: item.quantity,
               price: item.price,
             })),
-            totalAmount: order.totalAmount,
+            totalAmount: order.total,
             shippingAddress: order.shippingAddress,
+            ...(trackingNumber && { trackingNumber }),
+            ...(trackingUrl && { trackingUrl }),
           };
 
           if (status === "shipped") {
@@ -327,6 +333,145 @@ router.put(
     } catch (error) {
       console.error("Update order status error:", error);
       res.status(500).json({ error: "Failed to update order status" });
+    }
+  },
+);
+
+// Update order tracking information (admin only)
+router.put(
+  "/:orderId/tracking",
+  authenticateToken,
+  requireAdmin,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const { orderId } = req.params;
+      const { trackingNumber, trackingUrl, estimatedDelivery, notes } = req.body;
+
+      if (!getConnectionStatus()) {
+        res.status(503).json({ error: "Database connection required" });
+        return;
+      }
+
+      const updateData: any = {};
+      if (trackingNumber) updateData.trackingNumber = trackingNumber;
+      if (trackingUrl) updateData.trackingUrl = trackingUrl;
+      if (estimatedDelivery) updateData.estimatedDelivery = new Date(estimatedDelivery);
+      if (notes !== undefined) updateData.notes = notes;
+
+      const order = await Order.findByIdAndUpdate(
+        orderId,
+        updateData,
+        { new: true },
+      ).populate("user", "name email");
+
+      if (!order) {
+        res.status(404).json({ error: "Order not found" });
+        return;
+      }
+
+      res.json({
+        message: "Order tracking information updated successfully",
+        order,
+      });
+    } catch (error) {
+      console.error("Update order tracking error:", error);
+      res.status(500).json({ error: "Failed to update order tracking" });
+    }
+  },
+);
+
+// Get single order details (admin only)
+router.get(
+  "/:orderId",
+  authenticateToken,
+  requireAdmin,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const { orderId } = req.params;
+
+      if (!getConnectionStatus()) {
+        res.status(503).json({ error: "Database connection required" });
+        return;
+      }
+
+      const order = await Order.findById(orderId)
+        .populate("user", "name email phone")
+        .populate("items.product", "name price images slug")
+        .select("-__v");
+
+      if (!order) {
+        res.status(404).json({ error: "Order not found" });
+        return;
+      }
+
+      res.json({ order });
+    } catch (error) {
+      console.error("Get order details error:", error);
+      res.status(500).json({ error: "Failed to fetch order details" });
+    }
+  },
+);
+
+// Get order analytics (admin only)
+router.get(
+  "/analytics",
+  authenticateToken,
+  requireAdmin,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      if (!getConnectionStatus()) {
+        res.status(503).json({ error: "Database connection required" });
+        return;
+      }
+
+      // Get order statistics
+      const totalOrders = await Order.countDocuments();
+      const totalRevenue = await Order.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        { $group: { _id: null, total: { $sum: "$total" } } }
+      ]);
+
+      // Get orders by status
+      const ordersByStatus = await Order.aggregate([
+        { $group: { _id: "$status", count: { $sum: 1 } } }
+      ]);
+
+      // Get recent orders
+      const recentOrders = await Order.find()
+        .populate("user", "name email")
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .select("orderNumber total status createdAt user");
+
+      // Get orders by month (last 6 months)
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+      const ordersByMonth = await Order.aggregate([
+        { $match: { createdAt: { $gte: sixMonthsAgo } } },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            count: { $sum: 1 },
+            revenue: { $sum: "$total" }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ]);
+
+      res.json({
+        totalOrders,
+        totalRevenue: totalRevenue[0]?.total || 0,
+        ordersByStatus,
+        recentOrders,
+        ordersByMonth
+      });
+    } catch (error) {
+      console.error("Get order analytics error:", error);
+      res.status(500).json({ error: "Failed to fetch order analytics" });
     }
   },
 );

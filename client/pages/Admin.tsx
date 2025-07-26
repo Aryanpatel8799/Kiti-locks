@@ -76,18 +76,43 @@ interface Order {
   user?: {
     name: string;
     email: string;
+    phone?: string;
   } | null;
   items: Array<{
     product: {
       name: string;
+      _id: string;
     };
+    name: string;
     quantity: number;
     price: number;
+    image: string;
   }>;
+  subtotal: number;
+  tax: number;
+  shipping: number;
   total: number;
   status: string;
   paymentStatus: string;
+  paymentMethod: string;
+  shippingAddress: {
+    firstName: string;
+    lastName: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  trackingNumber?: string;
+  trackingUrl?: string;
+  estimatedDelivery?: string;
+  notes?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export default function Admin() {
@@ -98,6 +123,9 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isTrackingDialogOpen, setIsTrackingDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [uploadingImages, setUploadingImages] = useState(false);
@@ -127,6 +155,14 @@ export default function Admin() {
     name: "",
     description: "",
     featured: false,
+  });
+
+  // Order tracking form state
+  const [trackingForm, setTrackingForm] = useState({
+    trackingNumber: "",
+    trackingUrl: "",
+    estimatedDelivery: "",
+    notes: "",
   });
 
   // API call helper with comprehensive error handling
@@ -487,6 +523,93 @@ export default function Admin() {
     }
   };
 
+  const handleViewOrderDetails = async (orderId: string) => {
+    try {
+      const response = await apiCall(`/api/orders/${orderId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedOrder(data.order);
+        setIsOrderDetailsOpen(true);
+      } else {
+        toast.error("Failed to fetch order details");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch order details");
+    }
+  };
+
+  const handleUpdateTracking = async () => {
+    if (!selectedOrder) return;
+
+    try {
+      const response = await apiCall(`/api/orders/${selectedOrder._id}/tracking`, {
+        method: "PUT",
+        body: JSON.stringify(trackingForm),
+      });
+
+      if (response.ok) {
+        toast.success("Tracking information updated successfully");
+        setIsTrackingDialogOpen(false);
+        resetTrackingForm();
+        await fetchData();
+        // Update selected order if details are open
+        if (selectedOrder) {
+          await handleViewOrderDetails(selectedOrder._id);
+        }
+      } else {
+        toast.error("Failed to update tracking information");
+      }
+    } catch (error) {
+      toast.error("Failed to update tracking information");
+    }
+  };
+
+  const resetTrackingForm = () => {
+    setTrackingForm({
+      trackingNumber: "",
+      trackingUrl: "",
+      estimatedDelivery: "",
+      notes: "",
+    });
+  };
+
+  const openTrackingDialog = (order: Order) => {
+    setSelectedOrder(order);
+    setTrackingForm({
+      trackingNumber: order.trackingNumber || "",
+      trackingUrl: order.trackingUrl || "",
+      estimatedDelivery: order.estimatedDelivery 
+        ? new Date(order.estimatedDelivery).toISOString().split('T')[0] 
+        : "",
+      notes: order.notes || "",
+    });
+    setIsTrackingDialogOpen(true);
+  };
+
+  const getStatusBadgeColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "confirmed":
+        return "bg-blue-100 text-blue-800";
+      case "processing":
+        return "bg-purple-100 text-purple-800";
+      case "shipped":
+        return "bg-orange-100 text-orange-800";
+      case "delivered":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(price);
+  };
+
   const resetProductForm = () => {
     setProductForm({
       name: "",
@@ -537,13 +660,6 @@ export default function Admin() {
     });
     setEditingCategory(category);
     setIsCategoryDialogOpen(true);
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-    }).format(price);
   };
 
   if (user?.role !== "admin") {
@@ -1147,7 +1263,10 @@ export default function Admin() {
                       <TableHead>Items</TableHead>
                       <TableHead>Total</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Payment</TableHead>
+                      <TableHead>Tracking</TableHead>
                       <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1173,24 +1292,82 @@ export default function Admin() {
                         </TableCell>
                         <TableCell>{formatPrice(order.total)}</TableCell>
                         <TableCell>
-                          <select
+                          <Select
                             value={order.status}
-                            onChange={(e) =>
-                              handleOrderStatusChange(order._id, e.target.value)
+                            onValueChange={(value) =>
+                              handleOrderStatusChange(order._id, value)
                             }
-                            className="px-3 py-1 border border-slate-300 rounded-md text-sm bg-white"
                           >
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="refunded">Refunded</option>
-                          </select>
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="confirmed">Confirmed</SelectItem>
+                              <SelectItem value="processing">Processing</SelectItem>
+                              <SelectItem value="shipped">Shipped</SelectItem>
+                              <SelectItem value="delivered">Delivered</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Badge 
+                            className={`ml-2 ${getStatusBadgeColor(order.status)}`}
+                          >
+                            {order.status}
+                          </Badge>
                         </TableCell>
                         <TableCell>
-                          {new Date(order.createdAt).toLocaleDateString()}
+                          <Badge 
+                            variant={order.paymentStatus === "paid" ? "default" : "secondary"}
+                          >
+                            {order.paymentStatus}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {order.trackingNumber ? (
+                            <div className="text-sm">
+                              <p className="font-medium">{order.trackingNumber}</p>
+                              {order.trackingUrl && (
+                                <a 
+                                  href={order.trackingUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Track Package
+                                </a>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-slate-400">No tracking</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            <p>{new Date(order.createdAt).toLocaleDateString()}</p>
+                            {order.shippedAt && (
+                              <p className="text-slate-500">
+                                Shipped: {new Date(order.shippedAt).toLocaleDateString()}
+                              </p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewOrderDetails(order._id)}
+                            >
+                              View
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openTrackingDialog(order)}
+                            >
+                              Track
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1199,6 +1376,260 @@ export default function Admin() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Order Details Dialog */}
+          <Dialog open={isOrderDetailsOpen} onOpenChange={setIsOrderDetailsOpen}>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Order Details</DialogTitle>
+              </DialogHeader>
+              {selectedOrder && (
+                <div className="space-y-6">
+                  {/* Order Header */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="font-semibold text-lg">{selectedOrder.orderNumber}</h3>
+                      <p className="text-slate-600">
+                        Order Date: {new Date(selectedOrder.createdAt).toLocaleDateString()}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge className={getStatusBadgeColor(selectedOrder.status)}>
+                          {selectedOrder.status}
+                        </Badge>
+                        <Badge variant={selectedOrder.paymentStatus === "paid" ? "default" : "secondary"}>
+                          {selectedOrder.paymentStatus}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold">{formatPrice(selectedOrder.total)}</p>
+                      <p className="text-slate-600">
+                        Payment: {selectedOrder.paymentMethod}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Customer Information */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Customer Information</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {selectedOrder.user ? (
+                          <div className="space-y-2">
+                            <p><strong>Name:</strong> {selectedOrder.user.name}</p>
+                            <p><strong>Email:</strong> {selectedOrder.user.email}</p>
+                            {selectedOrder.user.phone && (
+                              <p><strong>Phone:</strong> {selectedOrder.user.phone}</p>
+                            )}
+                          </div>
+                        ) : (
+                          <p>Customer information not available</p>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Shipping Address</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-1">
+                          <p>{selectedOrder.shippingAddress.firstName} {selectedOrder.shippingAddress.lastName}</p>
+                          <p>{selectedOrder.shippingAddress.address1}</p>
+                          {selectedOrder.shippingAddress.address2 && (
+                            <p>{selectedOrder.shippingAddress.address2}</p>
+                          )}
+                          <p>
+                            {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.zipCode}
+                          </p>
+                          <p>{selectedOrder.shippingAddress.country}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Order Items */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Order Items</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Item</TableHead>
+                            <TableHead>Quantity</TableHead>
+                            <TableHead>Price</TableHead>
+                            <TableHead>Total</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedOrder.items.map((item, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                <div className="flex items-center gap-3">
+                                  <img 
+                                    src={item.image} 
+                                    alt={item.name}
+                                    className="w-12 h-12 object-cover rounded"
+                                  />
+                                  <div>
+                                    <p className="font-medium">{item.name}</p>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell>{item.quantity}</TableCell>
+                              <TableCell>{formatPrice(item.price)}</TableCell>
+                              <TableCell>{formatPrice(item.price * item.quantity)}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                      
+                      {/* Order Summary */}
+                      <div className="mt-4 space-y-2 text-right">
+                        <div className="flex justify-between">
+                          <span>Subtotal:</span>
+                          <span>{formatPrice(selectedOrder.subtotal)}</span>
+                        </div>
+                        {selectedOrder.tax > 0 && (
+                          <div className="flex justify-between">
+                            <span>Tax:</span>
+                            <span>{formatPrice(selectedOrder.tax)}</span>
+                          </div>
+                        )}
+                        {selectedOrder.shipping > 0 && (
+                          <div className="flex justify-between">
+                            <span>Shipping:</span>
+                            <span>{formatPrice(selectedOrder.shipping)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between font-bold text-lg border-t pt-2">
+                          <span>Total:</span>
+                          <span>{formatPrice(selectedOrder.total)}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Tracking Information */}
+                  {(selectedOrder.trackingNumber || selectedOrder.notes) && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Tracking & Notes</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {selectedOrder.trackingNumber && (
+                          <div>
+                            <Label className="font-medium">Tracking Number:</Label>
+                            <p>{selectedOrder.trackingNumber}</p>
+                          </div>
+                        )}
+                        {selectedOrder.trackingUrl && (
+                          <div>
+                            <Label className="font-medium">Tracking URL:</Label>
+                            <a 
+                              href={selectedOrder.trackingUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline block"
+                            >
+                              {selectedOrder.trackingUrl}
+                            </a>
+                          </div>
+                        )}
+                        {selectedOrder.estimatedDelivery && (
+                          <div>
+                            <Label className="font-medium">Estimated Delivery:</Label>
+                            <p>{new Date(selectedOrder.estimatedDelivery).toLocaleDateString()}</p>
+                          </div>
+                        )}
+                        {selectedOrder.notes && (
+                          <div>
+                            <Label className="font-medium">Notes:</Label>
+                            <p className="text-slate-600">{selectedOrder.notes}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Tracking Information Dialog */}
+          <Dialog open={isTrackingDialogOpen} onOpenChange={setIsTrackingDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Update Tracking Information</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="trackingNumber">Tracking Number</Label>
+                  <Input
+                    id="trackingNumber"
+                    value={trackingForm.trackingNumber}
+                    onChange={(e) =>
+                      setTrackingForm({ ...trackingForm, trackingNumber: e.target.value })
+                    }
+                    placeholder="Enter tracking number"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="trackingUrl">Tracking URL</Label>
+                  <Input
+                    id="trackingUrl"
+                    value={trackingForm.trackingUrl}
+                    onChange={(e) =>
+                      setTrackingForm({ ...trackingForm, trackingUrl: e.target.value })
+                    }
+                    placeholder="https://tracking.example.com/..."
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="estimatedDelivery">Estimated Delivery Date</Label>
+                  <Input
+                    id="estimatedDelivery"
+                    type="date"
+                    value={trackingForm.estimatedDelivery}
+                    onChange={(e) =>
+                      setTrackingForm({ ...trackingForm, estimatedDelivery: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="notes">Notes</Label>
+                  <Textarea
+                    id="notes"
+                    value={trackingForm.notes}
+                    onChange={(e) =>
+                      setTrackingForm({ ...trackingForm, notes: e.target.value })
+                    }
+                    placeholder="Additional notes about the order..."
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsTrackingDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleUpdateTracking}>
+                    Update Tracking
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </Tabs>
       </div>
     </div>
