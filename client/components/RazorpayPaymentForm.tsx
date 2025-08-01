@@ -112,6 +112,12 @@ export default function RazorpayPaymentForm({
         order_id: orderData.orderId,
         handler: async (response: any) => {
           try {
+            console.log("🔍 Frontend payment data:", {
+              shippingAddress,
+              billingDetails,
+              cartItems: cartItems?.length || 0
+            });
+
             // Send payment details to backend for verification and order creation
             const verifyResponse = await fetch("/api/checkout/razorpay-success", {
               method: "POST",
@@ -124,16 +130,41 @@ export default function RazorpayPaymentForm({
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
                 shippingAddress: {
-                  firstName: billingDetails.name.split(' ')[0] || billingDetails.name,
-                  lastName: billingDetails.name.split(' ')[1] || '',
-                  email: billingDetails.email,
-                  phone: billingDetails.contact,
+                  type: "shipping",
+                  firstName: shippingAddress?.firstName || billingDetails.name.split(' ')[0] || billingDetails.name,
+                  lastName: shippingAddress?.lastName || billingDetails.name.split(' ')[1] || '',
+                  email: shippingAddress?.email || billingDetails.email,
+                  phone: shippingAddress?.phone || billingDetails.contact,
+                  address1: shippingAddress?.address || "Default Address",
+                  city: shippingAddress?.city || "Default City", 
+                  state: shippingAddress?.state || "Default State",
+                  zipCode: shippingAddress?.zipCode || "000000",
+                  country: shippingAddress?.country || "India",
                 },
-                orderItems: [{ 
+                billingAddress: {
+                  type: "billing",
+                  firstName: shippingAddress?.firstName || billingDetails.name.split(' ')[0] || billingDetails.name,
+                  lastName: shippingAddress?.lastName || billingDetails.name.split(' ')[1] || '',
+                  email: shippingAddress?.email || billingDetails.email,
+                  phone: shippingAddress?.phone || billingDetails.contact,
+                  address1: shippingAddress?.address || "Default Address",
+                  city: shippingAddress?.city || "Default City",
+                  state: shippingAddress?.state || "Default State", 
+                  zipCode: shippingAddress?.zipCode || "000000",
+                  country: shippingAddress?.country || "India",
+                },
+                orderItems: cartItems?.map(item => ({
+                  product: item.id,
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price,
+                  image: item.image,
+                  variant: item.variant || undefined,
+                })) || [{ 
                   name: "Payment",
                   quantity: 1, 
                   price: amount 
-                }], // You should pass actual order items here
+                }],
               }),
             });
 

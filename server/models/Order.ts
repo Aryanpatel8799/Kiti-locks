@@ -44,6 +44,12 @@ export interface IOrder extends Document {
   estimatedDelivery?: Date;
   shippedAt?: Date;
   deliveredAt?: Date;
+  // Shiprocket integration fields
+  shipment_id?: string;
+  awb_code?: string;
+  courier_company_id?: string;
+  shiprocket_tracking_url?: string;
+  order_created_on_shiprocket?: boolean;
   // Removed cancellation and refund fields per user request
   createdAt: Date;
   updatedAt: Date;
@@ -115,6 +121,12 @@ const orderSchema = new Schema<IOrder>(
     estimatedDelivery: { type: Date },
     shippedAt: { type: Date },
     deliveredAt: { type: Date },
+    // Shiprocket integration fields
+    shipment_id: { type: String, trim: true },
+    awb_code: { type: String, trim: true },
+    courier_company_id: { type: String, trim: true },
+    shiprocket_tracking_url: { type: String, trim: true },
+    order_created_on_shiprocket: { type: Boolean, default: false },
   },
   {
     timestamps: true,

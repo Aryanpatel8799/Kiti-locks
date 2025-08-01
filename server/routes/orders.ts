@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
 import Order from "../models/Order";
+import User from "../models/User";
 import {
   authenticateToken,
   requireAdmin,
@@ -15,19 +16,20 @@ const router = Router();
 router.post(
   "/create",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
-      const {
+      const { 
+        paymentStatus = "pending",
         paymentIntentId,
-        items,
+        status = "pending",
+        items = [], 
         shippingAddress,
         subtotal,
-        tax,
-        shipping,
-        total,
-        paymentStatus = "paid",
-        status = "confirmed",
+        tax = 0,
+        shipping = 0,
+        total
       } = req.body;
+      const userId = (req as AuthRequest).user?.userId;
 
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });
@@ -45,7 +47,7 @@ router.post(
       // Create order
       const order = new Order({
         orderNumber,
-        user: req.user?.userId,
+        user: (req as AuthRequest).user?.userId,
         items: items.map((item: any) => ({
           product: item.productId,
           name: item.name,
@@ -137,7 +139,7 @@ router.get(
   "/",
   authenticateToken,
   requireAdmin,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });
@@ -158,18 +160,70 @@ router.get(
   },
 );
 
+// Track order by order number (for users)
+router.get(
+  "/track/:orderNumber",
+  authenticateToken,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { orderNumber } = req.params;
+      const userId = (req as AuthRequest).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({ error: "User not authenticated" });
+        return;
+      }
+
+      // Find order by order number and ensure it belongs to the authenticated user
+      const order = await Order.findOne({
+        orderNumber,
+        userId,
+      }).populate("userId", "name email");
+
+      if (!order) {
+        res.status(404).json({ error: "Order not found" });
+        return;
+      }
+
+      res.json({
+        message: "Order tracking information retrieved successfully",
+        order: {
+          id: order._id,
+          orderNumber: order.orderNumber,
+          status: order.status,
+          paymentStatus: order.paymentStatus,
+          total: order.total,
+          items: order.items,
+          shippingAddress: order.shippingAddress,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
+          // Include Shiprocket fields if available
+          shipment_id: order.shipment_id,
+          awb_code: order.awb_code,
+          courier_company_id: order.courier_company_id,
+          shiprocket_tracking_url: order.shiprocket_tracking_url,
+          order_created_on_shiprocket: order.order_created_on_shiprocket,
+        },
+      });
+    } catch (error) {
+      console.error("Track order error:", error);
+      res.status(500).json({ error: "Failed to retrieve order tracking information" });
+    }
+  },
+);
+
 // Get user's orders
 router.get(
   "/my",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });
         return;
       }
 
-      const orders = await Order.find({ user: req.user?.userId })
+      const orders = await Order.find({ user: (req as AuthRequest).user?.userId })
         .populate("items.product", "name price images")
         .sort({ createdAt: -1 })
         .select("-__v");
@@ -186,9 +240,9 @@ router.get(
 router.get(
   "/my-orders",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const userId = (req as AuthRequest).user!.id;
 
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });
@@ -212,7 +266,7 @@ router.get(
 router.get(
   "/:orderId",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { orderId } = req.params;
 
@@ -233,8 +287,8 @@ router.get(
 
       // Check if user owns this order or is admin
       if (
-        req.user?.role !== "admin" &&
-        order.user._id.toString() !== req.user?.userId
+        (req as AuthRequest).user?.role !== "admin" &&
+        order.user._id.toString() !== (req as AuthRequest).user?.userId
       ) {
         res.status(403).json({ error: "Access denied" });
         return;
@@ -253,7 +307,7 @@ router.put(
   "/:orderId/status",
   authenticateToken,
   requireAdmin,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { orderId } = req.params;
       const { status, trackingNumber, trackingUrl, estimatedDelivery, notes } = req.body;
@@ -342,7 +396,7 @@ router.put(
   "/:orderId/tracking",
   authenticateToken,
   requireAdmin,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { orderId } = req.params;
       const { trackingNumber, trackingUrl, estimatedDelivery, notes } = req.body;
@@ -385,7 +439,7 @@ router.get(
   "/:orderId",
   authenticateToken,
   requireAdmin,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { orderId } = req.params;
 
@@ -417,7 +471,7 @@ router.get(
   "/analytics",
   authenticateToken,
   requireAdmin,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });

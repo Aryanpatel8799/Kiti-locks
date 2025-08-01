@@ -23,6 +23,7 @@ import {
   Package,
   Home,
   ShoppingBag,
+  Truck,
   Info,
   Phone,
 } from "lucide-react";
@@ -168,6 +169,12 @@ export default function Navigation() {
                     <Link to="/orders" className="cursor-pointer">
                       <Package className="mr-2 h-4 w-4" />
                       <span>Orders</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/track-order" className="cursor-pointer">
+                      <Truck className="mr-2 h-4 w-4" />
+                      <span>Track Order</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -336,6 +343,14 @@ export default function Navigation() {
                         >
                           <Package className="w-4 h-4" />
                           <span className="text-sm font-medium">Orders</span>
+                        </Link>
+                        <Link
+                          to="/track-order"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center space-x-3 p-3 rounded-lg text-slate-700 hover:bg-white hover:text-blue-700 transition-colors"
+                        >
+                          <Truck className="w-4 h-4" />
+                          <span className="text-sm font-medium">Track Order</span>
                         </Link>
                         {user.role === "admin" && (
                           <Link

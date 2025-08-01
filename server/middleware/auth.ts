@@ -12,7 +12,7 @@ export interface AuthRequest extends Request {
 }
 
 export const authenticateToken = async (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
@@ -33,7 +33,8 @@ export const authenticateToken = async (
       return;
     }
 
-    req.user = {
+    // Cast request to AuthRequest and assign user data
+    (req as AuthRequest).user = {
       userId: decoded.userId,
       id: decoded.userId, // Backward compatibility
       email: decoded.email,
@@ -47,16 +48,17 @@ export const authenticateToken = async (
 };
 
 export const requireAdmin = (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): void => {
-  if (!req.user) {
+  const authReq = req as AuthRequest;
+  if (!authReq.user) {
     res.status(401).json({ error: "Authentication required" });
     return;
   }
 
-  if (req.user.role !== "admin") {
+  if (authReq.user.role !== "admin") {
     res.status(403).json({ error: "Admin access required" });
     return;
   }
@@ -65,7 +67,7 @@ export const requireAdmin = (
 };
 
 export const optionalAuth = async (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
@@ -78,7 +80,7 @@ export const optionalAuth = async (
       const user = await User.findById(decoded.userId).select("-password");
 
       if (user) {
-        req.user = {
+        (req as AuthRequest).user = {
           userId: decoded.userId,
           id: decoded.userId, // Backward compatibility
           email: decoded.email,

@@ -13,6 +13,7 @@ import orderRoutes from "./routes/orders";
 import checkoutRoutes from "./routes/checkout";
 import reviewRoutes from "./routes/reviews";
 import analyticsRoutes from "./routes/analytics";
+import shiprocketRoutes from "./routes/shiprocketRoutes";
 
 export function createServer() {
   const app = express();
@@ -193,6 +194,9 @@ export function createServer() {
 
   // Analytics routes
   app.use("/api/analytics", analyticsRoutes);
+
+  // Shiprocket routes
+  app.use("/api/shiprocket", shiprocketRoutes);
 
   // Error handling middleware
   app.use(

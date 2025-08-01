@@ -257,9 +257,10 @@ router.post("/refresh", async (req: Request, res: Response): Promise<void> => {
 router.get(
   "/me",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
-      const user = await User.findById(req.user?.userId)
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId)
         .select("-password")
         .populate("wishlist");
 
@@ -291,14 +292,15 @@ router.get(
 router.put(
   "/profile",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
+      const authReq = req as AuthRequest;
       const updateData = req.body;
       delete updateData.password;
       delete updateData.email;
       delete updateData.role;
 
-      const user = await User.findByIdAndUpdate(req.user?.userId, updateData, {
+      const user = await User.findByIdAndUpdate(authReq.user?.userId, updateData, {
         new: true,
         runValidators: true,
       }).select("-password");
@@ -345,7 +347,12 @@ router.post("/google", async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const googleUser = await response.json();
+    const googleUser = await response.json() as {
+      email: string;
+      name: string;
+      picture: string;
+      sub: string;
+    };
 
     // Check if user exists
     let user = await User.findOne({ email: googleUser.email });
@@ -423,15 +430,16 @@ router.get(
 router.get(
   "/profile",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const authReq = req as AuthRequest;
+      const userId = authReq.user!.userId;
 
       if (!getConnectionStatus()) {
         res.json({
           profile: {
-            name: req.user!.name,
-            email: req.user!.email,
+            name: authReq.user!.email, // Use email as fallback for name
+            email: authReq.user!.email,
             phone: "",
             bio: "",
             preferences: {
@@ -475,16 +483,21 @@ router.get(
 router.get(
   "/me",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
-      const user = req.user!;
+      const authReq = req as AuthRequest;
+      const user = authReq.user!;
+      
+      // Get full user data from database
+      const fullUser = await User.findById(user.userId).select("-password");
+      
       res.json({
         user: {
-          id: user.id,
-          name: user.name,
+          id: user.userId,
+          name: fullUser?.name || user.email,
           email: user.email,
           role: user.role,
-          avatar: user.avatar,
+          avatar: fullUser?.avatar,
         },
       });
     } catch (error) {
@@ -498,9 +511,10 @@ router.get(
 router.put(
   "/profile",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
-      const userId = req.user!.id;
+      const authReq = req as AuthRequest;
+      const userId = authReq.user!.userId;
       const { name, phone, bio, preferences } = req.body;
 
       if (!getConnectionStatus()) {
@@ -545,9 +559,10 @@ router.put(
 router.post(
   "/2fa/setup",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
-      const user = await User.findById(req.user?.userId);
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId);
       if (!user || user.role !== "admin") {
         res.status(403).json({ error: "Access denied" });
         return;
@@ -585,7 +600,7 @@ router.post(
 router.post(
   "/2fa/verify",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { token } = req.body;
 
@@ -594,7 +609,8 @@ router.post(
         return;
       }
 
-      const user = await User.findById(req.user?.userId);
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId);
       if (!user || user.role !== "admin") {
         res.status(403).json({ error: "Access denied" });
         return;
@@ -639,7 +655,7 @@ router.post(
 router.post(
   "/2fa/disable",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { password, token } = req.body;
 
@@ -648,7 +664,8 @@ router.post(
         return;
       }
 
-      const user = await User.findById(req.user?.userId);
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId);
       if (!user || user.role !== "admin") {
         res.status(403).json({ error: "Access denied" });
         return;

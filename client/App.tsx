@@ -33,6 +33,8 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import Orders from "./pages/Orders";
+import TrackOrder from "./pages/TrackOrder";
+import ShiprocketManagement from "./pages/ShiprocketManagement";
 
 const queryClient = new QueryClient();
 
@@ -110,16 +112,8 @@ const App = () => {
                                 <Route path="/account" element={<Profile />} />
                                 <Route path="/profile" element={<Profile />} />
                                 <Route path="/orders" element={<Orders />} />
-                                <Route
-                                  path="/orders"
-                                  element={
-                                    <div className="p-8 text-center">
-                                      <h1 className="text-2xl">
-                                        Orders coming soon
-                                      </h1>
-                                    </div>
-                                  }
-                                />
+                                <Route path="/track-order" element={<TrackOrder />} />
+                                <Route path="/shiprocket" element={<ShiprocketManagement />} />
                                 <Route
                                   path="/settings"
                                   element={

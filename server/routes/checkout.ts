@@ -1,7 +1,8 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import Razorpay from "razorpay";
 import crypto from "crypto";
-import { authenticateToken } from "../middleware/auth";
+import mongoose from "mongoose";
+import { authenticateToken, AuthRequest } from "../middleware/auth";
 import Order from "../models/Order";
 import User from "../models/User";
 import Product from "../models/Product";
@@ -46,10 +47,10 @@ try {
 }
 
 // Create Razorpay order - requires authentication
-router.post("/create-razorpay-order", authenticateToken as any, async (req: any, res: any) => {
+router.post("/create-razorpay-order", authenticateToken, async (req: Request, res: Response) => {
   try {
     const { items, currency = "INR" } = req.body;
-    const userId = req.user?.userId;
+    const userId = (req as AuthRequest).user?.userId;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Cart items are required" });
@@ -113,17 +114,19 @@ router.post("/create-razorpay-order", authenticateToken as any, async (req: any,
 });
 
 // Create checkout session - calculates amounts server-side
-router.post("/create-session", authenticateToken as any, async (req: any, res: any) => {
+router.post("/create-session", authenticateToken, async (req: Request, res: Response) => {
   try {
     const { items, shippingAddress } = req.body;
-    const userId = req.user?.userId;
+    const userId = (req as AuthRequest).user?.userId;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: "Cart items are required" });
+      res.status(400).json({ error: "Cart items are required" });
+      return;
     }
 
     if (!razorpay) {
-      return res.status(503).json({ error: "Payment service not available" });
+      res.status(503).json({ error: "Payment service not available" });
+      return;
     }
 
     // Calculate total amount from actual product prices (server-side validation)
@@ -181,10 +184,10 @@ router.post("/create-session", authenticateToken as any, async (req: any, res: a
 });
 
 // Verify Razorpay payment - requires authentication
-router.post("/verify-razorpay-payment", authenticateToken as any, async (req: any, res: any) => {
+router.post("/verify-razorpay-payment", authenticateToken, async (req: Request, res: Response) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-    const userId = req.user?.userId;
+    const userId = (req as AuthRequest).user?.userId;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({ error: "Missing payment verification data" });
@@ -220,7 +223,7 @@ router.post("/verify-razorpay-payment", authenticateToken as any, async (req: an
 });
 
 // Handle successful Razorpay payment
-router.post("/razorpay-success", authenticateToken as any, async (req: any, res: any) => {
+router.post("/razorpay-success", authenticateToken, async (req: Request, res: Response) => {
   try {
     const { 
       razorpay_payment_id, 
@@ -230,7 +233,17 @@ router.post("/razorpay-success", authenticateToken as any, async (req: any, res:
       items,
       shippingAddress
     } = req.body;
-    const userId = req.user?.userId;
+    const userId = (req as AuthRequest).user?.userId;
+
+    console.log("🔍 Razorpay success payload received:", {
+      razorpay_payment_id: !!razorpay_payment_id,
+      razorpay_order_id: !!razorpay_order_id,
+      razorpay_signature: !!razorpay_signature,
+      orderId: !!orderId,
+      itemsCount: items?.length || 0,
+      shippingAddress: shippingAddress ? Object.keys(shippingAddress) : 'undefined',
+      userId: userId || 'guest'
+    });
 
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
       return res.status(400).json({ error: "Missing payment details" });
@@ -262,7 +275,22 @@ router.post("/razorpay-success", authenticateToken as any, async (req: any, res:
 
     // Use items and shippingAddress from request body, or default values
     const orderItems = items || [];
-    const orderShippingAddress = shippingAddress || {};
+    
+    // Ensure address objects have all required fields with defaults
+    const ensureAddressDefaults = (address: any, type: 'shipping' | 'billing') => ({
+      type,
+      firstName: address?.firstName || "Guest",
+      lastName: address?.lastName || "User", 
+      address1: address?.address1 || address?.address || "Default Address",
+      city: address?.city || "Default City",
+      state: address?.state || "Default State",
+      zipCode: address?.zipCode || "000000",
+      country: address?.country || "India",
+      isDefault: false,
+    });
+
+    const orderShippingAddress = ensureAddressDefaults(shippingAddress, 'shipping');
+    const orderBillingAddress = ensureAddressDefaults(shippingAddress, 'billing'); // Use shipping as billing default
 
     // Recalculate amount from items for additional security validation
     let calculatedAmount = 0;
@@ -285,8 +313,14 @@ router.post("/razorpay-success", authenticateToken as any, async (req: any, res:
     
     const order = new Order({
       orderNumber: `ORD-${Date.now()}`,
-      user: userId || null,
-      items: orderItems,
+      user: userId || new mongoose.Types.ObjectId(), // Use dummy ObjectId for guest users
+      items: orderItems.map((item: any) => ({
+        product: item.productId || new mongoose.Types.ObjectId(),
+        name: item.name || "Product",
+        price: item.price || 0,
+        quantity: item.quantity || 1,
+        image: item.image || "/placeholder.svg",
+      })),
       subtotal: finalAmount, // No tax included
       tax: 0, // Explicitly no tax
       shipping: 0, // Explicitly no shipping cost
@@ -298,11 +332,28 @@ router.post("/razorpay-success", authenticateToken as any, async (req: any, res:
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
       shippingAddress: orderShippingAddress,
-      billingAddress: orderShippingAddress,
+      billingAddress: orderBillingAddress,
       status: "confirmed",
     });
 
-    await order.save();
+    try {
+      console.log("💾 Attempting to save order:", {
+        orderNumber: `ORD-${Date.now()}`,
+        userId: userId || "guest",
+        itemsCount: orderItems.length,
+        finalAmount,
+        shippingAddress: orderShippingAddress,
+      });
+
+      await order.save();
+      console.log("✅ Order saved successfully:", order._id);
+    } catch (saveError) {
+      console.error("❌ Order save failed:", saveError);
+      return res.status(500).json({ 
+        error: "Failed to create order", 
+        details: saveError instanceof Error ? saveError.message : "Unknown error"
+      });
+    }
 
     // Clear user's cart if logged in
     if (userId) {

@@ -19,6 +19,6 @@ export const loadRazorpay = () => {
   });
 };
 
-export const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_your_key_id';
+export const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_CjxI6ZFqFKX7Xs';
 
 export default { loadRazorpay, razorpayKeyId };
