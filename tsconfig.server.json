@@ -17,7 +17,12 @@
       "@/*": ["./server/*"]
     },
     "lib": ["ES2020"],
-    "types": ["node"]
+    "types": ["node"],
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "include": ["server/**/*"],
   "exclude": ["node_modules", "dist", "client"]

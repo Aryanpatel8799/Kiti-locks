@@ -7,6 +7,7 @@ import Order from "../models/Order";
 import User from "../models/User";
 import Product from "../models/Product";
 import emailService from "../services/emailService";
+import { createShiprocketOrderWithDefaults } from "../utils/shiprocketAuth";
 
 const router = express.Router();
 
@@ -231,6 +232,7 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
       razorpay_signature,
       orderId,
       items,
+      orderItems,
       shippingAddress
     } = req.body;
     const userId = (req as AuthRequest).user?.userId;
@@ -241,8 +243,18 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
       razorpay_signature: !!razorpay_signature,
       orderId: !!orderId,
       itemsCount: items?.length || 0,
+      orderItemsCount: orderItems?.length || 0,
       shippingAddress: shippingAddress ? Object.keys(shippingAddress) : 'undefined',
       userId: userId || 'guest'
+    });
+
+    // Use orderItems if available, fallback to items
+    const finalItems = orderItems || items || [];
+    
+    console.log("📦 Final items for processing:", {
+      finalItemsCount: finalItems.length,
+      sampleItem: finalItems[0] || "none",
+      allItemKeys: finalItems.length > 0 ? Object.keys(finalItems[0] || {}) : []
     });
 
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
@@ -274,13 +286,15 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
     }
 
     // Use items and shippingAddress from request body, or default values
-    const orderItems = items || [];
+    const orderItemsArray = finalItems || [];
     
     // Ensure address objects have all required fields with defaults
     const ensureAddressDefaults = (address: any, type: 'shipping' | 'billing') => ({
       type,
       firstName: address?.firstName || "Guest",
       lastName: address?.lastName || "User", 
+      email: address?.email || "guest@example.com",
+      phone: address?.phone || "9876543210",
       address1: address?.address1 || address?.address || "Default Address",
       city: address?.city || "Default City",
       state: address?.state || "Default State",
@@ -294,10 +308,12 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
 
     // Recalculate amount from items for additional security validation
     let calculatedAmount = 0;
-    if (orderItems.length > 0) {
-      for (const item of orderItems) {
-        if (item.productId) {
-          const product = await Product.findById(item.productId);
+    if (orderItemsArray.length > 0) {
+      for (const item of orderItemsArray) {
+        if (item.productId || item.product) {
+          // Handle both frontend formats: item.product (from orderItems) and item.productId (from items)
+          const productId = item.productId || item.product;
+          const product = await Product.findById(productId);
           if (product) {
             calculatedAmount += product.price * (item.quantity || 1);
           }
@@ -314,8 +330,8 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
     const order = new Order({
       orderNumber: `ORD-${Date.now()}`,
       user: userId || new mongoose.Types.ObjectId(), // Use dummy ObjectId for guest users
-      items: orderItems.map((item: any) => ({
-        product: item.productId || new mongoose.Types.ObjectId(),
+      items: orderItemsArray.map((item: any) => ({
+        product: item.productId || item.product || new mongoose.Types.ObjectId(),
         name: item.name || "Product",
         price: item.price || 0,
         quantity: item.quantity || 1,
@@ -340,13 +356,76 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
       console.log("💾 Attempting to save order:", {
         orderNumber: `ORD-${Date.now()}`,
         userId: userId || "guest",
-        itemsCount: orderItems.length,
+        itemsCount: orderItemsArray.length,
         finalAmount,
         shippingAddress: orderShippingAddress,
       });
 
       await order.save();
       console.log("✅ Order saved successfully:", order._id);
+
+      // 🚚 Automatically create Shiprocket order after successful payment
+      try {
+        console.log("🔗 Creating Shiprocket order for:", order._id);
+        
+        // Only create Shiprocket order if we have items
+        if (orderItemsArray.length === 0) {
+          console.warn("⚠️ No items found in order - skipping Shiprocket order creation");
+          console.warn("Available data:", { orderItemsArray, finalItems, items, orderItems });
+        } else {
+          const shiprocketOrderData = {
+            order_id: order._id.toString(),
+            customer_name: `${orderShippingAddress.firstName} ${orderShippingAddress.lastName}`.trim() || "Guest User",
+            customer_email: userId ? (await User.findById(userId))?.email || "guest@example.com" : "guest@example.com",
+            customer_phone: orderShippingAddress.phone || "9876543210", // Use phone from shipping address
+            shipping_address: {
+              address: orderShippingAddress.address1,
+              city: orderShippingAddress.city,
+              state: orderShippingAddress.state,
+              pincode: orderShippingAddress.zipCode,
+              country: orderShippingAddress.country
+            },
+            items: orderItemsArray.map((item: any) => ({
+              name: item.name || "Product",
+              sku: (item.productId || item.product)?.toString() || "SKU001",
+              units: item.quantity || 1,
+              selling_price: item.price || 0,
+              weight: 0.5 // Default weight - you can add weight to products
+            })),
+            payment_method: "Prepaid" as const, // Since payment is already completed
+            sub_total: finalAmount,
+            comment: `Order ${order.orderNumber} - ${orderShippingAddress.firstName} ${orderShippingAddress.lastName}`
+          };
+
+          console.log("📦 Shiprocket order data prepared:", {
+            order_id: shiprocketOrderData.order_id,
+            itemsCount: shiprocketOrderData.items.length,
+            items: shiprocketOrderData.items,
+            customer_name: shiprocketOrderData.customer_name,
+            sub_total: shiprocketOrderData.sub_total
+          });
+
+          const shiprocketOrder = await createShiprocketOrderWithDefaults(shiprocketOrderData);
+
+          // Update order with Shiprocket data
+          order.shipment_id = shiprocketOrder.shipment_id;
+          order.shiprocket_tracking_url = shiprocketOrder.tracking_url;
+          order.order_created_on_shiprocket = true;
+          await order.save();
+
+          console.log("✅ Shiprocket order created successfully:", {
+            orderId: order._id,
+            shipmentId: shiprocketOrder.shipment_id,
+            trackingUrl: shiprocketOrder.tracking_url
+          });
+        }
+
+      } catch (shiprocketError) {
+        console.error("❌ Shiprocket order creation failed:", shiprocketError);
+        // Don't fail the entire order - just log the error
+        // Order is still saved locally even if Shiprocket fails
+      }
+
     } catch (saveError) {
       console.error("❌ Order save failed:", saveError);
       return res.status(500).json({ 

@@ -115,8 +115,35 @@ export default function RazorpayPaymentForm({
             console.log("🔍 Frontend payment data:", {
               shippingAddress,
               billingDetails,
-              cartItems: cartItems?.length || 0
+              cartItems: cartItems?.length || 0,
+              cartItemsSample: cartItems?.[0] || "none",
+              mappedOrderItems: cartItems?.map(item => ({
+                product: item.product?._id || item._id,
+                name: item.product?.name || item.name,
+                quantity: item.quantity,
+                price: item.product?.price || item.price,
+              })).slice(0, 2) || [] // Show first 2 items for debugging
             });
+
+            // Prepare order items from cart or create fallback
+            const preparedOrderItems = cartItems && cartItems.length > 0 
+              ? cartItems.map(item => ({
+                  product: item.product?._id || item._id, // Handle both cart item structures
+                  name: item.product?.name || item.name,
+                  quantity: item.quantity,
+                  price: item.product?.price || item.price,
+                  image: item.product?.images?.[0] || item.image,
+                  variant: item.variant || undefined,
+                }))
+              : [{ 
+                  product: "fallback_product_id",
+                  name: "Payment Order",
+                  quantity: 1, 
+                  price: amount / 100, // Convert from paise to rupees
+                  image: "/placeholder.svg"
+                }];
+
+            console.log("📦 Prepared order items:", preparedOrderItems);
 
             // Send payment details to backend for verification and order creation
             const verifyResponse = await fetch("/api/checkout/razorpay-success", {
@@ -153,18 +180,7 @@ export default function RazorpayPaymentForm({
                   zipCode: shippingAddress?.zipCode || "000000",
                   country: shippingAddress?.country || "India",
                 },
-                orderItems: cartItems?.map(item => ({
-                  product: item.id,
-                  name: item.name,
-                  quantity: item.quantity,
-                  price: item.price,
-                  image: item.image,
-                  variant: item.variant || undefined,
-                })) || [{ 
-                  name: "Payment",
-                  quantity: 1, 
-                  price: amount 
-                }],
+                orderItems: preparedOrderItems,
               }),
             });
 

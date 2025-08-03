@@ -66,10 +66,13 @@ export default function Checkout() {
 
       if (response.ok) {
         const data = await response.json();
-        setOrder(data.order);
+        console.log("📦 Order data received:", data);
+        setOrder(data.order || data); // Handle both { order: ... } and direct order object
         clearCart(); // Clear cart after successful order
       } else {
-        setError("Failed to load order details");
+        const errorText = await response.text();
+        console.error("Failed to fetch order:", response.status, errorText);
+        setError(`Failed to load order details (${response.status})`);
       }
     } catch (error) {
       console.error("Order loading error:", error);
@@ -136,6 +139,20 @@ export default function Checkout() {
 
         {order && (
           <div className="space-y-6">
+            {/* Debug information - remove in production */}
+            {process.env.NODE_ENV === 'development' && (
+              <Card className="border-yellow-200 bg-yellow-50">
+                <CardContent className="p-4">
+                  <details>
+                    <summary className="text-yellow-800 font-medium cursor-pointer">Debug Order Data</summary>
+                    <pre className="text-xs mt-2 text-yellow-700 overflow-auto">
+                      {JSON.stringify(order, null, 2)}
+                    </pre>
+                  </details>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Order Summary */}
             <Card>
               <CardHeader>
@@ -164,7 +181,7 @@ export default function Checkout() {
                   </div>
                   <div className="flex justify-between items-center text-lg font-semibold">
                     <span>Total Amount:</span>
-                    <span>{formatPrice(order.totalAmount)}</span>
+                    <span>{formatPrice(order.total || order.totalAmount || 0)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -216,13 +233,23 @@ export default function Checkout() {
                       {order.shippingAddress.firstName}{" "}
                       {order.shippingAddress.lastName}
                     </p>
-                    <p>{order.shippingAddress.address}</p>
+                    <p>{order.shippingAddress.address1 || order.shippingAddress.address}</p>
                     <p>
                       {order.shippingAddress.city},{" "}
                       {order.shippingAddress.state}{" "}
                       {order.shippingAddress.zipCode}
                     </p>
                     <p>{order.shippingAddress.country}</p>
+                    {order.shippingAddress.email && (
+                      <p className="text-sm text-slate-600 mt-2">
+                        {order.shippingAddress.email}
+                      </p>
+                    )}
+                    {order.shippingAddress.phone && (
+                      <p className="text-sm text-slate-600">
+                        {order.shippingAddress.phone}
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -257,7 +284,7 @@ export default function Checkout() {
               </Button>
               {user && (
                 <Button
-                  onClick={() => navigate("/account/orders")}
+                  onClick={() => navigate("/orders")}
                   className="flex-1"
                 >
                   View All Orders

@@ -34,7 +34,7 @@ import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import Orders from "./pages/Orders";
 import TrackOrder from "./pages/TrackOrder";
-import ShiprocketManagement from "./pages/ShiprocketManagement";
+
 
 const queryClient = new QueryClient();
 
@@ -113,7 +113,7 @@ const App = () => {
                                 <Route path="/profile" element={<Profile />} />
                                 <Route path="/orders" element={<Orders />} />
                                 <Route path="/track-order" element={<TrackOrder />} />
-                                <Route path="/shiprocket" element={<ShiprocketManagement />} />
+
                                 <Route
                                   path="/settings"
                                   element={

@@ -769,7 +769,7 @@ export default function Admin() {
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="shiprocket">Shiprocket</TabsTrigger>
+
           </TabsList>
 
           {/* Products Tab */}
@@ -1378,29 +1378,7 @@ export default function Admin() {
             </Card>
           </TabsContent>
 
-          {/* Shiprocket Tab */}
-          <TabsContent value="shiprocket">
-            <Card>
-              <CardHeader>
-                <CardTitle>Shiprocket Integration</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Package className="w-16 h-16 mx-auto text-blue-500 mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Shiprocket Management</h3>
-                  <p className="text-gray-600 mb-4">
-                    Access the full Shiprocket logistics management interface to create orders, track shipments, and handle cancellations.
-                  </p>
-                  <Button 
-                    onClick={() => window.open('/shiprocket', '_blank')}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    Open Shiprocket Manager
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
 
           {/* Order Details Dialog */}
           <Dialog open={isOrderDetailsOpen} onOpenChange={setIsOrderDetailsOpen}>

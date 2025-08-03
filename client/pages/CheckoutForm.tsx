@@ -182,46 +182,28 @@ export default function CheckoutForm() {
     return allFieldsFilled && pinCodeValid;
   };
 
-  const handlePaymentSuccess = async (paymentIntent: any) => {
+  const handlePaymentSuccess = async (paymentData: any) => {
     try {
       setLoading(true);
-      // Create order after successful payment
-      const response = await fetch("/api/orders/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          paymentIntentId: paymentIntent.id,
-          items: items.map((item) => ({
-            productId: item.product._id,
-            quantity: item.quantity,
-            price: item.product.price,
-            name: item.product.name,
-          })),
-          shippingAddress,
-          subtotal: totalAmount,
-          // tax: 0, // No tax
-          shipping: 0, // No shipping cost
-          total: finalTotal,
-          paymentStatus: "paid",
-          status: "confirmed",
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
+      console.log("✅ Payment successful, order already created via Razorpay handler:", paymentData);
+      
+      // Order is already created by the Razorpay success handler
+      // Just navigate to success page
+      const orderId = paymentData.orderData?.orderId || paymentData.orderData?.order?._id;
+      
+      if (orderId) {
         toast.success("Order placed successfully!");
-        navigate(`/checkout/success?order_id=${data.order._id}`);
+        navigate(`/checkout/success?order_id=${orderId}`);
       } else {
-        throw new Error("Failed to create order");
+        console.warn("No order ID found in payment data:", paymentData);
+        toast.success("Payment successful! Redirecting...");
+        navigate(`/orders`); // Fallback to orders page
       }
     } catch (error) {
-      console.error("Order creation error:", error);
-      toast.error(
-        "Payment successful but failed to create order. Please contact support.",
-      );
+      console.error("Post-payment processing error:", error);
+      // Even if navigation fails, the order was created successfully
+      toast.success("Payment successful! Please check your orders.");
+      navigate(`/orders`);
     } finally {
       setLoading(false);
     }

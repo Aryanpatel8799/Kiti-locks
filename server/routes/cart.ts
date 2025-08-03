@@ -1,15 +1,15 @@
-import { Router, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import { z } from "zod";
 import { authenticateToken, AuthRequest } from "../middleware/auth";
 import User from "../models/User";
 import Product from "../models/Product";
 import { getConnectionStatus } from "../config/database";
 
-const router = Router();
+const router = express.Router();
 
 const addToCartSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
-  quantity: z.number().min(1, "Quantity must be at least 1").default(1),
+  quantity: z.number().min(1, "Quantity must be at least 1"),
   variant: z
     .object({
       name: z.string(),
@@ -19,21 +19,29 @@ const addToCartSchema = z.object({
 });
 
 const updateCartItemSchema = z.object({
-  quantity: z.number().min(0, "Quantity must be non-negative"),
+  productId: z.string().min(1, "Product ID is required"),
+  quantity: z.number().min(0, "Quantity must be at least 0"),
+  variant: z
+    .object({
+      name: z.string(),
+      value: z.string(),
+    })
+    .optional(),
 });
 
 // Get user's cart (for logged-in users)
 router.get(
   "/",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });
         return;
       }
 
-      const user = await User.findById(req.user?.userId).populate({
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId).populate({
         path: "cart.product",
         model: "Product",
         populate: {
@@ -48,7 +56,7 @@ router.get(
       }
 
       // Filter out cart items with null product
-      const filteredCart = (user.cart || []).filter(item => item.product);
+      const filteredCart = (user.cart || []).filter((item: any) => item.product);
       res.json({ cart: filteredCart });
     } catch (error) {
       console.error("Get cart error:", error);
@@ -61,7 +69,7 @@ router.get(
 router.post(
   "/add",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { productId, quantity, variant } = addToCartSchema.parse(req.body);
 
@@ -70,7 +78,8 @@ router.post(
         return;
       }
 
-      const user = await User.findById(req.user?.userId);
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId);
       const product = await Product.findById(productId);
 
       if (!user) {
@@ -133,27 +142,35 @@ router.post(
 
 // Update cart item quantity
 router.put(
-  "/:productId",
+  "/update",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
-      const { productId } = req.params;
-      const { quantity } = updateCartItemSchema.parse(req.body);
+      const { productId, quantity, variant } = updateCartItemSchema.parse(req.body);
 
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });
         return;
       }
 
-      const user = await User.findById(req.user?.userId);
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId);
 
-      if (!user || !user.cart) {
-        res.status(404).json({ error: "Cart not found" });
+      if (!user) {
+        res.status(404).json({ error: "User not found" });
         return;
       }
 
+      if (!user.cart) {
+        res.status(404).json({ error: "Cart is empty" });
+        return;
+      }
+
+      // Find the item in cart
       const itemIndex = user.cart.findIndex(
-        (item: any) => item.product.toString() === productId,
+        (item: any) =>
+          item.product.toString() === productId &&
+          JSON.stringify(item.variant) === JSON.stringify(variant),
       );
 
       if (itemIndex === -1) {
@@ -162,7 +179,7 @@ router.put(
       }
 
       if (quantity === 0) {
-        // Remove item from cart
+        // Remove item if quantity is 0
         user.cart.splice(itemIndex, 1);
       } else {
         // Update quantity
@@ -189,9 +206,9 @@ router.put(
 
 // Remove item from cart
 router.delete(
-  "/:productId",
+  "/remove/:productId",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { productId } = req.params;
 
@@ -200,16 +217,21 @@ router.delete(
         return;
       }
 
-      const user = await User.findById(req.user?.userId);
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId);
 
-      if (!user || !user.cart) {
-        res.status(404).json({ error: "Cart not found" });
+      if (!user) {
+        res.status(404).json({ error: "User not found" });
         return;
       }
 
-      user.cart = user.cart.filter(
-        (item: any) => item.product.toString() !== productId,
-      );
+      if (!user.cart) {
+        res.status(404).json({ error: "Cart is empty" });
+        return;
+      }
+
+      // Remove item from cart
+      user.cart = user.cart.filter((item: any) => item.product.toString() !== productId);
 
       await user.save();
 
@@ -221,18 +243,19 @@ router.delete(
   },
 );
 
-// Clear entire cart
+// Clear cart
 router.delete(
-  "/",
+  "/clear",
   authenticateToken,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       if (!getConnectionStatus()) {
         res.status(503).json({ error: "Database connection required" });
         return;
       }
 
-      const user = await User.findById(req.user?.userId);
+      const authReq = req as AuthRequest;
+      const user = await User.findById(authReq.user?.userId);
 
       if (!user) {
         res.status(404).json({ error: "User not found" });
