@@ -9,11 +9,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
-  User,
   Mail,
-  MapPin,
   Calendar,
   Shield,
   Edit3,
@@ -21,7 +27,9 @@ import {
   X,
   Camera,
   Package,
-  AlertCircle,
+  Eye,
+  EyeOff,
+  Lock,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -32,25 +40,11 @@ interface UserProfile {
   phone?: string;
   avatar?: string;
   bio?: string;
-  addresses: Address[];
   preferences: {
     newsletter: boolean;
     notifications: boolean;
     marketing: boolean;
   };
-}
-
-interface Address {
-  _id?: string;
-  type: "home" | "work" | "other";
-  firstName: string;
-  lastName: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  isDefault: boolean;
 }
 
 interface Order {
@@ -78,7 +72,6 @@ export default function Profile() {
     phone: "",
     avatar: user?.avatar || "",
     bio: "",
-    addresses: [],
     preferences: {
       newsletter: true,
       notifications: true,
@@ -88,8 +81,19 @@ export default function Profile() {
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishlistCount, setWishlistCount] = useState(0);
-  const [reviewCount, setReviewCount] = useState(0);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   // Handle authentication check in useEffect
   useEffect(() => {
@@ -174,20 +178,6 @@ export default function Profile() {
         setWishlistCount(wishlistData.items?.length || 0);
       } else if (wishlistResponse.status === 401 || wishlistResponse.status === 403) {
         console.warn("Authentication error fetching wishlist");
-      }
-
-      // Fetch user reviews count
-      const reviewsResponse = await fetch("/api/reviews/user/my-reviews", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (reviewsResponse.ok) {
-        const reviewsData = await reviewsResponse.json();
-        setReviewCount(reviewsData.pagination?.total || 0);
-      } else if (reviewsResponse.status === 401 || reviewsResponse.status === 403) {
-        console.warn("Authentication error fetching reviews");
       }
     } catch (error) {
       console.error("Error fetching user stats:", error);
@@ -351,6 +341,58 @@ export default function Profile() {
     }
   };
 
+  const handleChangePassword = async () => {
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+
+    setPasswordLoading(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/auth/change-password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Password updated successfully!");
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setShowPasswordForm(false);
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to update password");
+      }
+    } catch (error) {
+      console.error("Password change error:", error);
+      toast.error("Failed to update password");
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -500,7 +542,7 @@ export default function Profile() {
                   {user?.role === "admin" ? "Administrator" : "Customer"}
                 </Badge>
 
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div className="text-center">
                     <div className="text-xl font-bold text-slate-900">
                       {orders.length}
@@ -512,12 +554,6 @@ export default function Profile() {
                       {wishlistCount}
                     </div>
                     <div className="text-xs text-slate-600">Wishlist</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xl font-bold text-slate-900">
-                      {reviewCount}
-                    </div>
-                    <div className="text-xs text-slate-600">Reviews</div>
                   </div>
                 </div>
               </CardContent>
@@ -531,10 +567,9 @@ export default function Profile() {
             className="lg:col-span-3"
           >
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="orders">Orders</TabsTrigger>
-                <TabsTrigger value="addresses">Addresses</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
 
@@ -677,13 +712,71 @@ export default function Profile() {
                                   ).toLocaleDateString()}
                                 </p>
                               </div>
-                              <div className="text-right">
+                              <div className="text-right flex flex-col gap-2">
                                 <Badge className={getStatusColor(order.status)}>
                                   {order.status}
                                 </Badge>
-                                <p className="text-lg font-semibold mt-1">
+                                <p className="text-lg font-semibold">
                                   {formatPrice(order.totalAmount)}
                                 </p>
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button size="sm" variant="outline">
+                                      View Details
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-2xl">
+                                    <DialogHeader>
+                                      <DialogTitle>
+                                        Order #{order._id.slice(-8).toUpperCase()}
+                                      </DialogTitle>
+                                      <DialogDescription>
+                                        Order placed on {new Date(order.createdAt).toLocaleDateString()}
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                      <div className="flex justify-between items-center">
+                                        <span className="font-medium">Status:</span>
+                                        <Badge className={getStatusColor(order.status)}>
+                                          {order.status}
+                                        </Badge>
+                                      </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="font-medium">Total Amount:</span>
+                                        <span className="text-xl font-bold">
+                                          {formatPrice(order.totalAmount)}
+                                        </span>
+                                      </div>
+                                      <Separator />
+                                      <div>
+                                        <h4 className="font-medium mb-3">Order Items</h4>
+                                        <div className="space-y-3">
+                                          {order.items.map((item, index) => (
+                                            <div
+                                              key={index}
+                                              className="flex justify-between items-center p-3 bg-slate-50 rounded-lg"
+                                            >
+                                              <div>
+                                                <p className="font-medium">{item.name}</p>
+                                                <p className="text-sm text-slate-600">
+                                                  Quantity: {item.quantity}
+                                                </p>
+                                                <p className="text-sm text-slate-600">
+                                                  Price per item: {formatPrice(item.price)}
+                                                </p>
+                                              </div>
+                                              <div className="text-right">
+                                                <p className="font-medium">
+                                                  {formatPrice(item.price * item.quantity)}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
                               </div>
                             </div>
                             <div className="space-y-2">
@@ -700,87 +793,6 @@ export default function Profile() {
                                   </span>
                                 </div>
                               ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Addresses Tab */}
-              <TabsContent value="addresses" className="space-y-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="w-5 h-5" />
-                      Saved Addresses
-                    </CardTitle>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        // Add new address functionality
-                        toast.success("Add address feature coming soon!");
-                      }}
-                    >
-                      Add Address
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    {profile.addresses.length === 0 ? (
-                      <div className="text-center py-8">
-                        <MapPin className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                        <p className="text-slate-600 mb-4">
-                          No saved addresses
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          Add an address to make checkout faster
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4">
-                        {profile.addresses.map((address, index) => (
-                          <div
-                            key={index}
-                            className="p-4 border border-slate-200 rounded-lg hover:shadow-md transition-shadow"
-                          >
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Badge
-                                    variant={
-                                      address.isDefault ? "default" : "outline"
-                                    }
-                                  >
-                                    {address.type}
-                                  </Badge>
-                                  {address.isDefault && (
-                                    <Badge variant="secondary">Default</Badge>
-                                  )}
-                                </div>
-                                <p className="font-medium text-slate-900">
-                                  {address.firstName} {address.lastName}
-                                </p>
-                                <p className="text-slate-600">
-                                  {address.address}
-                                </p>
-                                <p className="text-slate-600">
-                                  {address.city}, {address.state}{" "}
-                                  {address.zipCode}
-                                </p>
-                                <p className="text-slate-600">
-                                  {address.country}
-                                </p>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button size="sm" variant="outline">
-                                  Edit
-                                </Button>
-                                <Button size="sm" variant="outline">
-                                  Delete
-                                </Button>
-                              </div>
                             </div>
                           </div>
                         ))}
@@ -905,155 +917,219 @@ export default function Profile() {
                         />
                       </motion.div>
                     </div>
+
+                    {!editing && (
+                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-700">
+                          💡 <strong>Tip:</strong> Click "Edit Profile" above to modify your notification preferences.
+                        </p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
-                {/* Security Settings */}
+                {/* Change Password */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lock className="w-5 h-5" />
+                      Change Password
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {!showPasswordForm ? (
+                      <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                        <div>
+                          <p className="font-medium">Update Password</p>
+                          <p className="text-sm text-slate-600">
+                            Change your account password for better security
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowPasswordForm(true)}
+                          className="flex items-center gap-2"
+                        >
+                          <Lock className="w-4 h-4" />
+                          Change Password
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="currentPassword">Current Password</Label>
+                          <div className="relative">
+                            <Input
+                              id="currentPassword"
+                              type={showPasswords.current ? "text" : "password"}
+                              value={passwordForm.currentPassword}
+                              onChange={(e) =>
+                                setPasswordForm({
+                                  ...passwordForm,
+                                  currentPassword: e.target.value,
+                                })
+                              }
+                              placeholder="Enter your current password"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                              onClick={() =>
+                                setShowPasswords({
+                                  ...showPasswords,
+                                  current: !showPasswords.current,
+                                })
+                              }
+                            >
+                              {showPasswords.current ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="newPassword">New Password</Label>
+                          <div className="relative">
+                            <Input
+                              id="newPassword"
+                              type={showPasswords.new ? "text" : "password"}
+                              value={passwordForm.newPassword}
+                              onChange={(e) =>
+                                setPasswordForm({
+                                  ...passwordForm,
+                                  newPassword: e.target.value,
+                                })
+                              }
+                              placeholder="Enter your new password"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                              onClick={() =>
+                                setShowPasswords({
+                                  ...showPasswords,
+                                  new: !showPasswords.new,
+                                })
+                              }
+                            >
+                              {showPasswords.new ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                          <div className="relative">
+                            <Input
+                              id="confirmPassword"
+                              type={showPasswords.confirm ? "text" : "password"}
+                              value={passwordForm.confirmPassword}
+                              onChange={(e) =>
+                                setPasswordForm({
+                                  ...passwordForm,
+                                  confirmPassword: e.target.value,
+                                })
+                              }
+                              placeholder="Confirm your new password"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                              onClick={() =>
+                                setShowPasswords({
+                                  ...showPasswords,
+                                  confirm: !showPasswords.confirm,
+                                })
+                              }
+                            >
+                              {showPasswords.confirm ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setShowPasswordForm(false);
+                              setPasswordForm({
+                                currentPassword: "",
+                                newPassword: "",
+                                confirmPassword: "",
+                              });
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={handleChangePassword}
+                            disabled={passwordLoading}
+                            className="flex items-center gap-2"
+                          >
+                            <Lock className="w-4 h-4" />
+                            {passwordLoading ? "Updating..." : "Update Password"}
+                          </Button>
+                        </div>
+
+                        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                          <p className="text-sm text-yellow-700">
+                            ⚠️ <strong>Security Tips:</strong>
+                          </p>
+                          <ul className="text-xs text-yellow-600 mt-1 space-y-1">
+                            <li>• Use at least 6 characters</li>
+                            <li>• Include a mix of letters, numbers, and symbols</li>
+                            <li>• Don't use personal information</li>
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Account Information */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Shield className="w-5 h-5" />
-                      Security Settings
+                      Account Information
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
-                      <div>
-                        <p className="font-medium">Change Password</p>
-                        <p className="text-sm text-slate-600">
-                          Update your account password
-                        </p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          toast.success("Change password feature coming soon!");
-                        }}
-                      >
-                        Change
-                      </Button>
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <h4 className="font-medium text-green-800 mb-2">✅ Available Features</h4>
+                      <ul className="text-sm text-green-700 space-y-1">
+                        <li>• Update your personal information (name, phone, bio)</li>
+                        <li>• Upload and change your profile picture</li>
+                        <li>• View your complete order history with detailed information</li>
+                        <li>• Change your account password securely</li>
+                        <li>• Manage notification preferences</li>
+                        <li>• Track your wishlist items</li>
+                      </ul>
                     </div>
-
-                    <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
-                      <div>
-                        <p className="font-medium">Two-Factor Authentication</p>
-                        <p className="text-sm text-slate-600">
-                          Add an extra layer of security to your account
-                        </p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          toast.success("2FA setup coming soon!");
-                        }}
-                      >
-                        Setup
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
-                      <div>
-                        <p className="font-medium">Login History</p>
-                        <p className="text-sm text-slate-600">
-                          View recent login activity
-                        </p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          toast.success("Login history feature coming soon!");
-                        }}
-                      >
-                        View
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Account Management */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="w-5 h-5" />
-                      Account Management
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
-                      <div>
-                        <p className="font-medium">Download Data</p>
-                        <p className="text-sm text-slate-600">
-                          Download a copy of your account data
-                        </p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          toast.success("Data export feature coming soon!");
-                        }}
-                      >
-                        Download
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
-                      <div>
-                        <p className="font-medium">Deactivate Account</p>
-                        <p className="text-sm text-slate-600">
-                          Temporarily disable your account
-                        </p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          toast.success(
-                            "Account deactivation feature coming soon!",
-                          );
-                        }}
-                      >
-                        Deactivate
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Danger Zone */}
-                <Card className="border-red-200 bg-red-50">
-                  <CardHeader>
-                    <CardTitle className="text-red-600 flex items-center gap-2">
-                      <AlertCircle className="w-5 h-5" />
-                      Danger Zone
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="p-4 border border-red-200 rounded-lg bg-white">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium text-red-600 mb-2">
-                            Delete Account
-                          </p>
-                          <p className="text-sm text-slate-600 mb-4">
-                            Once you delete your account, there is no going
-                            back. All your data will be permanently removed.
-                            Please be certain.
-                          </p>
-                          <ul className="text-xs text-slate-500 space-y-1 mb-4">
-                            <li>• All personal information will be deleted</li>
-                            <li>• Order history will be permanently removed</li>
-                            <li>• Wishlist and saved items will be lost</li>
-                            <li>• This action cannot be undone</li>
-                          </ul>
-                        </div>
-                      </div>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          toast.error("Account deletion feature coming soon!");
-                        }}
-                      >
-                        Delete Account
-                      </Button>
+                    
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                      <h4 className="font-medium text-slate-800 mb-2">🔒 Your Account is Secure</h4>
+                      <p className="text-sm text-slate-600">
+                        Your account information is protected and securely stored. 
+                        Only you can access and modify your profile details.
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

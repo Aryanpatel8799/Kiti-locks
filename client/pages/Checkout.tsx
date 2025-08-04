@@ -140,7 +140,7 @@ export default function Checkout() {
         {order && (
           <div className="space-y-6">
             {/* Debug information - remove in production */}
-            {process.env.NODE_ENV === 'development' && (
+            {/* {process.env.NODE_ENV === 'development' && (
               <Card className="border-yellow-200 bg-yellow-50">
                 <CardContent className="p-4">
                   <details>
@@ -151,7 +151,7 @@ export default function Checkout() {
                   </details>
                 </CardContent>
               </Card>
-            )}
+            )} */}
 
             {/* Order Summary */}
             <Card>

@@ -723,4 +723,50 @@ router.get("/users/count", authenticateToken, async (req, res) => {
   }
 });
 
+// Change password
+router.put(
+  "/change-password",
+  authenticateToken,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const authReq = req as AuthRequest;
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        res.status(400).json({ error: "Current password and new password are required" });
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        res.status(400).json({ error: "New password must be at least 6 characters" });
+        return;
+      }
+
+      const user = await User.findById(authReq.user?.userId);
+      if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return;
+      }
+
+      // Verify current password
+      const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+      if (!isCurrentPasswordValid) {
+        res.status(400).json({ error: "Current password is incorrect" });
+        return;
+      }
+
+      // Update password
+      user.password = newPassword;
+      await user.save();
+
+      res.json({
+        message: "Password updated successfully",
+      });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ error: "Failed to change password" });
+    }
+  },
+);
+
 export default router;
