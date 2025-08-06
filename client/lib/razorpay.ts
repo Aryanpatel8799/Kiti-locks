@@ -29,7 +29,7 @@ export const loadRazorpay = () => {
   });
 };
 
-export const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_CjxI6ZFqFKX7Xs';
+export const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_bZVO0eg5MIF71m';
 
 console.log("Razorpay Key ID:", razorpayKeyId);
 
