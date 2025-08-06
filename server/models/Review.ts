@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IReview extends Document {
   product: mongoose.Types.ObjectId;
@@ -9,8 +9,23 @@ export interface IReview extends Document {
   verified: boolean; // Whether the user purchased the product
   helpful: number; // Number of helpful votes
   helpfulUsers: mongoose.Types.ObjectId[]; // Users who marked as helpful
+  likes: mongoose.Types.ObjectId[]; // Users who liked this review
+  reports: Array<{
+    user: mongoose.Types.ObjectId;
+    reason: string;
+    reportedAt: Date;
+  }>;
+  images?: string[]; // Optional review images
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IReviewModel extends Model<IReview> {
+  calculateAverageRating(productId: mongoose.Types.ObjectId): Promise<{
+    averageRating: number;
+    totalReviews: number;
+    distribution: { [key: number]: number };
+  }>;
 }
 
 const reviewSchema = new Schema<IReview>(
@@ -55,6 +70,35 @@ const reviewSchema = new Schema<IReview>(
       {
         type: Schema.Types.ObjectId,
         ref: "User",
+      },
+    ],
+    likes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    reports: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        reason: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        reportedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    images: [
+      {
+        type: String,
       },
     ],
   },
@@ -123,7 +167,7 @@ reviewSchema.post("save", async function () {
 
 reviewSchema.post("findOneAndDelete", async function (doc) {
   if (doc) {
-    const Review = mongoose.model("Review");
+    const Review = mongoose.model("Review") as IReviewModel;
     const Product = mongoose.model("Product");
 
     const stats = await Review.calculateAverageRating(doc.product);
@@ -136,6 +180,6 @@ reviewSchema.post("findOneAndDelete", async function (doc) {
   }
 });
 
-const Review =
-  mongoose.models.Review || mongoose.model<IReview>("Review", reviewSchema);
+const Review = (mongoose.models.Review || 
+  mongoose.model<IReview, IReviewModel>("Review", reviewSchema)) as IReviewModel;
 export default Review;

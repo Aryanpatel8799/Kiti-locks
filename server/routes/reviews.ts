@@ -91,11 +91,10 @@ router.get("/product/:productId", async (req: Request, res: Response) => {
     };
 
     // Calculate rating distribution
-    const distribution = [1, 2, 3, 4, 5].map((rating) => ({
-      rating,
-      count: ratingStats.ratingDistribution.filter((r: number) => r === rating)
-        .length,
-    }));
+    const distribution: { [key: number]: number } = {};
+    [1, 2, 3, 4, 5].forEach((rating) => {
+      distribution[rating] = ratingStats.ratingDistribution.filter((r: number) => r === rating).length;
+    });
 
     res.json({
       reviews,
@@ -361,25 +360,80 @@ router.post("/:reviewId/like", authenticateToken, async (req: Request, res: Resp
     }
 
     // Check if user already liked this review
-    const hasLiked = review.likes.includes(userId);
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const hasLiked = review.likes?.includes(userObjectId) || false;
 
     if (hasLiked) {
       // Unlike
-      review.likes = review.likes.filter((id: any) => id.toString() !== userId);
+      review.likes = review.likes?.filter((id: any) => id.toString() !== userId) || [];
     } else {
       // Like
-      review.likes.push(userId);
+      if (!review.likes) review.likes = [];
+      review.likes.push(userObjectId);
     }
 
     await review.save();
 
     res.json({
       liked: !hasLiked,
-      likesCount: review.likes.length,
+      likesCount: review.likes?.length || 0,
     });
   } catch (error) {
     console.error("Error toggling review like:", error);
     res.status(500).json({ error: "Failed to toggle review like" });
+  }
+});
+
+// Mark review as helpful/unhelpful
+router.post("/:reviewId/helpful", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const { reviewId } = req.params;
+    const authReq = req as AuthRequest;
+    const userId = authReq.user!.userId;
+
+    // Require database connection
+    if (!getConnectionStatus()) {
+      return res.status(503).json({
+        error:
+          "Database connection required. Please ensure MongoDB is connected.",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ error: "Invalid review ID" });
+    }
+
+    // Find the review
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ error: "Review not found" });
+    }
+
+    // Check if user already marked this review as helpful
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const hasMarkedHelpful = review.helpfulUsers.includes(userObjectId);
+
+    if (hasMarkedHelpful) {
+      // Remove helpful vote
+      review.helpfulUsers = review.helpfulUsers.filter(
+        (id: any) => id.toString() !== userId
+      );
+      review.helpful = Math.max(0, review.helpful - 1);
+    } else {
+      // Add helpful vote
+      review.helpfulUsers.push(userObjectId);
+      review.helpful += 1;
+    }
+
+    await review.save();
+
+    res.json({
+      helpful: review.helpful,
+      userMarkedHelpful: !hasMarkedHelpful,
+    });
+  } catch (error) {
+    console.error("Error toggling helpful status:", error);
+    res.status(500).json({ error: "Failed to toggle helpful status" });
   }
 });
 
@@ -414,17 +468,18 @@ router.post("/:reviewId/report", authenticateToken, async (req: Request, res: Re
     }
 
     // Check if user already reported this review
-    const hasReported = review.reports.some(
+    const hasReported = review.reports?.some(
       (report: any) => report.user.toString() === userId,
-    );
+    ) || false;
 
     if (hasReported) {
       return res.status(400).json({ error: "You have already reported this review" });
     }
 
     // Add report
+    if (!review.reports) review.reports = [];
     review.reports.push({
-      user: userId,
+      user: new mongoose.Types.ObjectId(userId),
       reason: reason.trim(),
       reportedAt: new Date(),
     });

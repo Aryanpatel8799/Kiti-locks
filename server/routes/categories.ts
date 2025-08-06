@@ -31,12 +31,12 @@ const createSlug = (name: string): string => {
     .replace(/[^a-z0-9 -]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
-    .trim("-");
+    .replace(/^-+|-+$/g, "");
 };
 
 router.get("/", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { featured, parent } = req.query;
+    const { featured, parent, includeStats } = req.query;
 
     // Require database connection - no mock data
     if (!getConnectionStatus()) {
@@ -46,22 +46,89 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
-    const filter: any = {};
+    
+    let categories;
+    
+    if (includeStats) {
+      // Use aggregation to include product counts
+      const pipeline: any[] = [
+        {
+          $lookup: {
+            from: "products",
+            localField: "_id",
+            foreignField: "category",
+            as: "products"
+          }
+        },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "parent",
+            foreignField: "_id",
+            as: "parentInfo"
+          }
+        },
+        {
+          $addFields: {
+            productCount: { $size: "$products" },
+            parent: { $arrayElemAt: ["$parentInfo", 0] }
+          }
+        },
+        {
+          $project: {
+            name: 1,
+            slug: 1,
+            description: 1,
+            image: 1,
+            featured: 1,
+            sortOrder: 1,
+            seo: 1,
+            productCount: 1,
+            parent: {
+              _id: 1,
+              name: 1,
+              slug: 1
+            }
+          }
+        }
+      ];
 
-    if (featured === "true") {
-      filter.featured = true;
+      // Add filters if needed
+      const matchStage: any = {};
+      if (featured === "true") {
+        matchStage.featured = true;
+      }
+      if (parent) {
+        matchStage.parent = parent;
+      } else if (parent === "null") {
+        matchStage.parent = null;
+      }
+      
+      if (Object.keys(matchStage).length > 0) {
+        pipeline.unshift({ $match: matchStage });
+      }
+
+      pipeline.push({ $sort: { sortOrder: 1, name: 1 } });
+
+      categories = await Category.aggregate(pipeline);
+    } else {
+      const filter: any = {};
+
+      if (featured === "true") {
+        filter.featured = true;
+      }
+
+      if (parent) {
+        filter.parent = parent;
+      } else if (parent === "null") {
+        filter.parent = null;
+      }
+
+      categories = await Category.find(filter)
+        .populate("parent", "name slug")
+        .sort({ sortOrder: 1, name: 1 })
+        .select("-__v");
     }
-
-    if (parent) {
-      filter.parent = parent;
-    } else if (parent === "null") {
-      filter.parent = null;
-    }
-
-    const categories = await Category.find(filter)
-      .populate("parent", "name slug")
-      .sort({ sortOrder: 1, name: 1 })
-      .select("-__v");
 
     res.json({ categories });
   } catch (error) {
@@ -101,8 +168,9 @@ router.post(
   "/",
   authenticateToken,
   requireAdmin,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
+      const authReq = req as AuthRequest;
       const validatedData = categorySchema.parse(req.body);
 
       if (validatedData.parent) {
@@ -154,8 +222,9 @@ router.put(
   "/:id",
   authenticateToken,
   requireAdmin,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
+      const authReq = req as AuthRequest;
       const { id } = req.params;
       const validatedData = categorySchema.parse(req.body);
 
@@ -222,8 +291,9 @@ router.delete(
   "/:id",
   authenticateToken,
   requireAdmin,
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
+      const authReq = req as AuthRequest;
       const { id } = req.params;
 
       const hasChildren = await Category.findOne({ parent: id });

@@ -17,12 +17,13 @@ import PerformanceMonitor from "./components/PerformanceMonitor";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
+import Categories from "./pages/Categories";
+import Settings from "./pages/Settings";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import CheckoutForm from "./pages/CheckoutForm";
 import Checkout from "./pages/Checkout";
 import DemoPayment from "./pages/DemoPayment";
-import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -83,13 +84,7 @@ const App = () => {
                                 />
                                 <Route
                                   path="/categories"
-                                  element={
-                                    <div className="p-8 text-center">
-                                      <h1 className="text-2xl">
-                                        Categories coming soon
-                                      </h1>
-                                    </div>
-                                  }
+                                  element={<Categories />}
                                 />
                                 <Route path="/about" element={<About />} />
                                 <Route path="/contact" element={<Contact />} />
@@ -109,20 +104,13 @@ const App = () => {
                                   path="/checkout/success"
                                   element={<Checkout />}
                                 />
-                                <Route path="/account" element={<Profile />} />
-                                <Route path="/profile" element={<Profile />} />
+                                <Route path="/account" element={<Settings />} />
                                 <Route path="/orders" element={<Orders />} />
                                 <Route path="/track-order" element={<TrackOrder />} />
 
                                 <Route
                                   path="/settings"
-                                  element={
-                                    <div className="p-8 text-center">
-                                      <h1 className="text-2xl">
-                                        Settings coming soon
-                                      </h1>
-                                    </div>
-                                  }
+                                  element={<Settings />}
                                 />
                                 <Route path="/admin" element={<Admin />} />
                                 <Route path="*" element={<NotFound />} />

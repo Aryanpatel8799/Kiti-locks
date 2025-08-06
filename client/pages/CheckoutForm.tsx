@@ -114,7 +114,7 @@ export default function CheckoutForm() {
 
   // Redirect to login if not authenticated (only after loading is complete)
   if (!authLoading && !isAuthenticated) {
-    navigate("/login?redirect=/checkout");
+    navigate("/login?redirect=/checkout/form");
     return null;
   }
 
@@ -240,7 +240,7 @@ export default function CheckoutForm() {
           </p>
         </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
             {/* Checkout Form */}
             <div className="space-y-6">
               {/* Shipping Information */}
@@ -252,7 +252,7 @@ export default function CheckoutForm() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">First Name *</Label>
                       <Input
@@ -311,7 +311,7 @@ export default function CheckoutForm() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="city">City *</Label>
                       <Input
@@ -342,7 +342,7 @@ export default function CheckoutForm() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="zipCode">PIN Code *</Label>
                       <Input
@@ -424,9 +424,9 @@ export default function CheckoutForm() {
                     {items.map((item) => (
                       <div
                         key={item._id}
-                        className="flex items-center space-x-4"
+                        className="flex items-center space-x-3 sm:space-x-4"
                       >
-                        <div className="w-16 h-16 bg-slate-200 rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-200 rounded-lg flex items-center justify-center flex-shrink-0">
                           {item.product.images?.[0] ? (
                             <img
                               src={item.product.images[0]}
@@ -439,16 +439,16 @@ export default function CheckoutForm() {
                             </span>
                           )}
                         </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium text-sm">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm truncate">
                             {item.product.name}
                           </h4>
                           <p className="text-slate-600 text-sm">
                             Qty: {item.quantity}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <p className="font-medium">
+                        <div className="text-right flex-shrink-0">
+                          <p className="font-medium text-sm">
                             {formatPrice(item.product.price * item.quantity)}
                           </p>
                         </div>

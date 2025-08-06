@@ -409,7 +409,7 @@ export default function ProductDetail() {
             <div className="space-y-3 pt-6 border-t">
               <div className="flex items-center space-x-3 text-sm text-slate-600">
                 <Truck className="w-5 h-5 text-green-600" />
-                <span>Free shipping on orders over $100</span>
+                <span>Free shipping on orders over ₹2000</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-slate-600">
                 <Shield className="w-5 h-5 text-blue-600" />

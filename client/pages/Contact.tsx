@@ -33,16 +33,16 @@ export default function Contact() {
     {
       icon: Mail,
       title: "Email Us",
-      value: "hello@Kiti Locks.com",
+      value: "customercare@kitilocks.com",
       description: "Send us an email anytime",
-      action: "mailto:hello@Kiti Locks.com",
+      action: "mailto:customercare@kitilocks.com",
     },
     {
       icon: Phone,
       title: "Call Us",
-      value: "+1 (555) 123-4567",
+      value: "+91 9990125444",
       description: "Mon-Fri 9AM-6PM EST",
-      action: "tel:+15551234567",
+      action: "tel:+919990125444",
     },
     {
       icon: MessageCircle,
@@ -54,9 +54,9 @@ export default function Contact() {
     {
       icon: MapPin,
       title: "Visit Us",
-      value: "123 Hardware St, Design City, DC 12345",
+      value: "Khuntia Enterprises Pvt. Ltd. F-43B First Floor, Khanpur Extn. New Delhi DL, India-110062",
       description: "Showroom & Warehouse",
-      action: "https://maps.google.com",
+      action: "#",
     },
   ];
 
@@ -196,39 +196,7 @@ export default function Contact() {
  
 
       {/* Location Map Placeholder */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Visit Our Showroom
-            </h2>
-            <p className="text-lg text-slate-600">
-              See our products in person and get expert advice from our team
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center"
-          >
-            <div className="text-center">
-              <MapPin className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <p className="text-slate-600 mb-2">Interactive Map Coming Soon</p>
-              <p className="text-sm text-slate-500">
-                123 Hardware St, Design City, DC 12345
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      
     </div>
   );
 }

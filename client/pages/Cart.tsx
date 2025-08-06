@@ -29,20 +29,29 @@ export default function Cart() {
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <ShoppingBag className="mx-auto h-16 w-16 text-slate-400 mb-4" />
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-md border border-gray-200">
+          <div className="h-16 w-16 sm:h-20 sm:w-20 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShoppingBag className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+          </div>
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
             Sign in to view your cart
           </h2>
-          <p className="text-slate-600 mb-6">
+          <p className="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed">
             Please sign in to see items in your cart and proceed to checkout.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button asChild>
+            <Button 
+              asChild 
+              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white"
+            >
               <Link to="/login">Sign In</Link>
             </Button>
-            <Button variant="outline" asChild>
+            <Button 
+              variant="outline" 
+              asChild 
+              className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
               <Link to="/register">Create Account</Link>
             </Button>
           </div>
@@ -58,10 +67,7 @@ export default function Cart() {
     }).format(price);
   };
 
-  const handleQuantityChange = async (
-    productId: string,
-    newQuantity: number,
-  ) => {
+  const handleQuantityChange = async (productId: string, newQuantity: number) => {
     if (newQuantity < 0) return;
 
     setUpdatingItems((prev) => new Set(prev).add(productId));
@@ -110,31 +116,38 @@ export default function Cart() {
     }
   };
 
-  // const estimatedTax = totalAmount * 0.08; // 8% tax
-  const shipping = totalAmount > 100 ? 0 : 10; // Free shipping over $100
+  const shipping = totalAmount > 2000 ? 0 : 100;
   const finalTotal = totalAmount + shipping;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your cart...</p>
+        </div>
       </div>
     );
   }
 
   if (validItems.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <ShoppingBag className="mx-auto h-16 w-16 text-slate-400 mb-4" />
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">
+          <div className="text-center max-w-md mx-auto">
+            <div className="h-24 w-24 sm:h-32 sm:w-32 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ShoppingBag className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
               Your cart is empty
             </h2>
-            <p className="text-slate-600 mb-8">
-              Looks like you haven't added any items to your cart yet.
+            <p className="text-gray-600 text-sm sm:text-base mb-8 leading-relaxed">
+              Looks like you haven't added any items to your cart yet. Discover our amazing products!
             </p>
-            <Button asChild>
+            <Button 
+              asChild 
+              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white"
+            >
               <Link to="/products">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Continue Shopping
@@ -147,20 +160,24 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        {/* Simple Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">
+              <h1 className="text-3xl font-bold text-gray-900">
                 Shopping Cart
               </h1>
-              <p className="text-slate-600 mt-1">
+              <p className="text-gray-600 mt-1">
                 {itemsCount} {itemsCount === 1 ? "item" : "items"} in your cart
               </p>
             </div>
-            <Button asChild variant="outline">
+            <Button 
+              asChild 
+              variant="outline" 
+              className="bg-white hover:bg-gray-50 border-gray-300 text-gray-700"
+            >
               <Link to="/products">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Continue Shopping
@@ -169,33 +186,40 @@ export default function Cart() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Cart Items</CardTitle>
-                {validItems.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleClearCart}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Clear Cart
-                  </Button>
-                )}
+          <div className="xl:col-span-2 space-y-4 lg:space-y-6">
+            <Card className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+              <CardHeader className="bg-gray-900 text-white p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                  <CardTitle className="text-xl sm:text-2xl font-semibold flex items-center gap-3">
+                    <div className="p-2 bg-white/10 rounded-lg">
+                      <ShoppingBag className="w-6 h-6" />
+                    </div>
+                    Your Items
+                  </CardTitle>
+                  {validItems.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearCart}
+                      className="text-red-200 hover:text-white hover:bg-red-500/20"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Clear Cart
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="p-6 space-y-6">
                 {validItems.map((item) => (
                   <div
                     key={item.product._id}
-                    className="border-b border-slate-200 pb-6 last:border-b-0 last:pb-0"
+                    className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex flex-col lg:flex-row lg:items-start gap-4 lg:gap-6">
                       {/* Product Image */}
-                      <div className="flex-shrink-0 w-24 h-24 bg-slate-100 rounded-lg overflow-hidden">
+                      <div className="flex-shrink-0 w-full sm:w-32 lg:w-28 h-32 lg:h-28 bg-gray-100 rounded-lg overflow-hidden shadow-sm">
                         {item.product && item.product.images && item.product.images.length > 0 ? (
                           <img
                             src={item.product.images[0]}
@@ -203,79 +227,82 @@ export default function Cart() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                            <span className="text-xs text-slate-500">
-                              No Image
-                            </span>
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                            <span className="text-sm text-gray-500 font-medium">No Image</span>
                           </div>
                         )}
                       </div>
 
                       {/* Product Details */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-base font-semibold text-slate-900 mb-1">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0">
+                          <div className="flex-1 pr-4">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
                               {item.product ? item.product.name : "Unknown Product"}
                             </h3>
-                            <p className="text-sm text-slate-500 mb-2">
-                              {item.product && item.product.category ? item.product.category.name : "Unknown Category"}
-                            </p>
-                            {item.variant && (
-                              <Badge
-                                variant="secondary"
-                                className="text-xs mb-2"
-                              >
-                                {item.variant.name}: {item.variant.value}
+                            <div className="flex items-center gap-2 mb-3">
+                              <Badge variant="outline" className="text-xs bg-gray-50 border-gray-200 text-gray-700">
+                                {item.product && item.product.category ? item.product.category.name : "Unknown Category"}
                               </Badge>
+                              {item.product && item.product.stock <= 5 && (
+                                <Badge variant="outline" className="text-xs bg-orange-50 border-orange-200 text-orange-700">
+                                  Only {item.product.stock} left!
+                                </Badge>
+                              )}
+                            </div>
+                            {item.variant && (
+                              <div className="mb-3">
+                                <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700 border border-gray-200">
+                                  <span className="font-medium">{item.variant.name}:</span> {item.variant.value}
+                                </Badge>
+                              </div>
                             )}
-                            <p className="text-lg font-semibold text-slate-900">
-                              {item.product ? formatPrice(item.product.price) : "N/A"}
-                            </p>
-                            {item.product && item.product.stock <= 5 && (
-                              <p className="text-sm text-orange-600 mt-1">
-                                Only {item.product.stock} left in stock
+                            <div className="flex items-center gap-3 mb-3">
+                              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                                {item.product ? formatPrice(item.product.price) : "N/A"}
                               </p>
-                            )}
+                              {item.product && item.product.comparePrice && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-gray-500 line-through">
+                                    {formatPrice(item.product.comparePrice)}
+                                  </span>
+                                  <Badge variant="destructive" className="text-xs bg-red-500 text-white">
+                                    Save {Math.round(((item.product.comparePrice - item.product.price) / item.product.comparePrice) * 100)}%
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
                           </div>
 
-                          {/* Remove Button - Top right on mobile */}
+                          {/* Remove Button */}
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="w-8 h-8 p-0 text-red-600 hover:text-red-700 sm:hidden"
+                            className="w-10 h-10 p-0 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-all duration-200 border border-red-200 hover:border-red-500"
                             onClick={() => item.product && handleRemoveItem(item.product._id)}
                             disabled={item.product ? updatingItems.has(item.product._id) : true}
                           >
-                            <X className="w-4 h-4" />
+                            <X className="w-5 h-5" />
                           </Button>
                         </div>
 
-                        {/* Quantity Controls and Total - Bottom row on mobile */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
+                        {/* Quantity Controls and Total */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 pt-4 border-t border-gray-100">
                           <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-slate-700">
-                              Quantity:
-                            </span>
-                            <div className="flex items-center space-x-2">
+                            <span className="text-sm font-semibold text-gray-700">Quantity:</span>
+                            <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-1">
                               <Button
                                 size="sm"
-                                variant="outline"
-                                className="w-8 h-8 p-0"
+                                variant="ghost"
+                                className="w-8 h-8 p-0 hover:bg-white"
                                 onClick={() =>
-                                  item.product && handleQuantityChange(
-                                    item.product._id,
-                                    item.quantity - 1,
-                                  )
+                                  item.product && handleQuantityChange(item.product._id, item.quantity - 1)
                                 }
                                 disabled={
-                                  item.product
-                                    ? updatingItems.has(item.product._id) ||
-                                      item.quantity <= 1
-                                    : true
+                                  item.product ? updatingItems.has(item.product._id) || item.quantity <= 1 : true
                                 }
                               >
-                                <Minus className="w-3 h-3" />
+                                <Minus className="w-4 h-4" />
                               </Button>
 
                               <Input
@@ -286,60 +313,36 @@ export default function Cart() {
                                 onChange={(e) => {
                                   const value = parseInt(e.target.value);
                                   if (value && value > 0 && item.product) {
-                                    handleQuantityChange(
-                                      item.product._id,
-                                      value,
-                                    );
+                                    handleQuantityChange(item.product._id, value);
                                   }
                                 }}
-                                className="w-16 h-8 text-center"
+                                className="w-16 h-8 text-center border-0 bg-white text-sm font-semibold"
                                 disabled={item.product ? updatingItems.has(item.product._id) : true}
                               />
 
                               <Button
                                 size="sm"
-                                variant="outline"
-                                className="w-8 h-8 p-0"
+                                variant="ghost"
+                                className="w-8 h-8 p-0 hover:bg-white"
                                 onClick={() =>
-                                  item.product && handleQuantityChange(
-                                    item.product._id,
-                                    item.quantity + 1,
-                                  )
+                                  item.product && handleQuantityChange(item.product._id, item.quantity + 1)
                                 }
                                 disabled={
                                   item.product
-                                    ? updatingItems.has(item.product._id) ||
-                                      item.quantity >= item.product.stock
+                                    ? updatingItems.has(item.product._id) || item.quantity >= item.product.stock
                                     : true
                                 }
                               >
-                                <Plus className="w-3 h-3" />
+                                <Plus className="w-4 h-4" />
                               </Button>
                             </div>
                           </div>
 
                           <div className="flex items-center justify-between sm:justify-end gap-4">
-                            {/* Item Total */}
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-slate-900">
-                                {item.product ? formatPrice(item.product.price * item.quantity) : "N/A"}
-                              </p>
-                              <p className="text-sm text-slate-500">
-                                {item.quantity} ×{" "}
-                                {item.product ? formatPrice(item.product.price) : "N/A"}
-                              </p>
-                            </div>
-
-                            {/* Remove Button - Right side on desktop */}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="hidden sm:flex w-8 h-8 p-0 text-red-600 hover:text-red-700"
-                              onClick={() => item.product && handleRemoveItem(item.product._id)}
-                              disabled={item.product ? updatingItems.has(item.product._id) : true}
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                            <span className="text-sm text-gray-600">Subtotal:</span>
+                            <span className="text-lg font-bold text-gray-900">
+                              {item.product ? formatPrice(item.product.price * item.quantity) : "N/A"}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -351,59 +354,62 @@ export default function Cart() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-4">
-              <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+          <div className="xl:col-span-1">
+            <Card className="sticky top-4 bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+              <CardHeader className="bg-gray-900 text-white p-6">
+                <CardTitle className="text-xl sm:text-2xl font-semibold">Order Summary</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-slate-600">
-                    Subtotal ({validItems.length} {validItems.length === 1 ? "item" : "items"})
-                  </span>
-                  <span className="font-medium">
-                    {formatPrice(totalAmount)}
-                  </span>
-                </div>
-
-                {/* <div className="flex justify-between">
-                  <span className="text-slate-600">Estimated Tax</span>
-                  <span className="font-medium">
-                    {formatPrice(estimatedTax)}
-                  </span>
-                </div> */}
-
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Shipping</span>
-                  <span className="font-medium">
-                    {shipping === 0 ? (
-                      <span className="text-green-600">Free</span>
-                    ) : (
-                      formatPrice(shipping)
-                    )}
-                  </span>
-                </div>
-
-                {totalAmount < 100 && (
-                  <div className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
-                    Add {formatPrice(100 - totalAmount)} more to qualify for
-                    free shipping
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">
+                      Subtotal ({validItems.length} {validItems.length === 1 ? "item" : "items"})
+                    </span>
+                    <span className="font-semibold text-lg">
+                      {formatPrice(totalAmount)}
+                    </span>
                   </div>
-                )}
 
-                <Separator />
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Shipping</span>
+                    <span className="font-semibold text-lg">
+                      {shipping === 0 ? (
+                        <span className="text-gray-900">Free</span>
+                      ) : (
+                        formatPrice(shipping)
+                      )}
+                    </span>
+                  </div>
 
-                <div className="flex justify-between text-lg font-semibold">
-                  <span>Total</span>
-                  <span>{formatPrice(finalTotal)}</span>
+                  {totalAmount <= 2000 && (
+                    <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                      Add {formatPrice(2000 - totalAmount)} more for free shipping!
+                    </div>
+                  )}
                 </div>
 
-                <Button className="w-full" size="lg" asChild>
-                  <Link to="/checkout/form">Proceed to Checkout</Link>
+                <Separator className="bg-gray-200" />
+
+                <div className="flex justify-between items-center text-lg font-bold">
+                  <span>Total</span>
+                  <span className="text-2xl text-gray-900">
+                    {formatPrice(finalTotal)}
+                  </span>
+                </div>
+
+                <Button 
+                  asChild 
+                  className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white text-lg font-medium"
+                >
+                  <Link to="/checkout/form">
+                    Proceed to Checkout
+                  </Link>
                 </Button>
 
-                <div className="text-center text-sm text-slate-500">
-                  <p>Secure checkout powered by Razorpay</p>
+                <div className="text-center">
+                  <Button variant="outline" asChild className="w-full bg-white hover:bg-gray-50 border-gray-300">
+                    <Link to="/products">Continue Shopping</Link>
+                  </Button>
                 </div>
               </CardContent>
             </Card>

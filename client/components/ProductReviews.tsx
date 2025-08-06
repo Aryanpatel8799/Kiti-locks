@@ -14,6 +14,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -23,7 +29,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { Star, ThumbsUp, User, Calendar, CheckCircle } from "lucide-react";
+import { Star, ThumbsUp, Heart, Flag, User, Calendar, CheckCircle, MoreHorizontal } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Review {
@@ -34,6 +40,11 @@ interface Review {
   verified: boolean;
   helpful: number;
   userMarkedHelpful: boolean;
+  likes: number;
+  userLiked: boolean;
+  reports: number;
+  userReported: boolean;
+  images?: string[];
   createdAt: string;
   user: {
     _id: string;
@@ -63,7 +74,7 @@ export default function ProductReviews({
   productId,
   productName,
 }: ProductReviewsProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState<ReviewStats>({
     averageRating: 0,
@@ -204,6 +215,75 @@ export default function ProductReviews({
       }
     } catch (error) {
       toast.error("Failed to update helpful status");
+    }
+  };
+
+  const handleLike = async (reviewId: string) => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to like reviews");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/reviews/${reviewId}/like`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setReviews((prevReviews) =>
+          prevReviews.map((review) =>
+            review._id === reviewId
+              ? {
+                  ...review,
+                  likes: data.likes,
+                  userLiked: data.userLiked,
+                }
+              : review,
+          ),
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to update like status");
+    }
+  };
+
+  const handleReport = async (reviewId: string, reason: string) => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to report reviews");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/reviews/${reviewId}/report`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ reason }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setReviews((prevReviews) =>
+          prevReviews.map((review) =>
+            review._id === reviewId
+              ? {
+                  ...review,
+                  reports: data.reports,
+                  userReported: data.userReported,
+                }
+              : review,
+          ),
+        );
+        toast.success("Review reported successfully");
+      }
+    } catch (error) {
+      toast.error("Failed to report review");
     }
   };
 
@@ -441,18 +521,78 @@ export default function ProductReviews({
                         {review.comment}
                       </p>
 
-                      <div className="flex items-center gap-4">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`text-slate-600 hover:text-blue-600 ${
-                            review.userMarkedHelpful ? "text-blue-600" : ""
-                          }`}
-                          onClick={() => handleHelpful(review._id)}
-                        >
-                          <ThumbsUp className="w-4 h-4 mr-1" />
-                          Helpful ({review.helpful})
-                        </Button>
+                      {/* Review Images */}
+                      {review.images && review.images.length > 0 && (
+                        <div className="flex gap-2 mt-3">
+                          {review.images.map((image, index) => (
+                            <img
+                              key={index}
+                              src={image}
+                              alt={`Review image ${index + 1}`}
+                              className="w-16 h-16 object-cover rounded-md cursor-pointer hover:opacity-80"
+                              onClick={() => window.open(image, '_blank')}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`text-slate-600 hover:text-blue-600 ${
+                              review.userMarkedHelpful ? "text-blue-600" : ""
+                            }`}
+                            onClick={() => handleHelpful(review._id)}
+                          >
+                            <ThumbsUp className="w-4 h-4 mr-1" />
+                            Helpful ({review.helpful})
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`text-slate-600 hover:text-red-600 ${
+                              review.userLiked ? "text-red-600" : ""
+                            }`}
+                            onClick={() => handleLike(review._id)}
+                          >
+                            <Heart className={`w-4 h-4 mr-1 ${review.userLiked ? "fill-current" : ""}`} />
+                            Like ({review.likes})
+                          </Button>
+                        </div>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-slate-600">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            {!review.userReported ? (
+                              <>
+                                <DropdownMenuItem onClick={() => handleReport(review._id, "spam")}>
+                                  <Flag className="w-4 h-4 mr-2" />
+                                  Report as Spam
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleReport(review._id, "inappropriate")}>
+                                  <Flag className="w-4 h-4 mr-2" />
+                                  Report as Inappropriate
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleReport(review._id, "fake")}>
+                                  <Flag className="w-4 h-4 mr-2" />
+                                  Report as Fake
+                                </DropdownMenuItem>
+                              </>
+                            ) : (
+                              <DropdownMenuItem disabled>
+                                <Flag className="w-4 h-4 mr-2" />
+                                Already Reported
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   </div>

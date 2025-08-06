@@ -262,6 +262,70 @@ router.get(
   },
 );
 
+// Get order analytics (admin only) - MUST BE BEFORE /:orderId route
+router.get(
+  "/analytics",
+  authenticateToken,
+  requireAdmin,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!getConnectionStatus()) {
+        res.status(503).json({ error: "Database connection required" });
+        return;
+      }
+
+      // Get order statistics
+      const totalOrders = await Order.countDocuments();
+      const totalRevenue = await Order.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        { $group: { _id: null, total: { $sum: "$total" } } }
+      ]);
+
+      // Get orders by status
+      const ordersByStatus = await Order.aggregate([
+        { $group: { _id: "$status", count: { $sum: 1 } } }
+      ]);
+
+      // Get recent orders
+      const recentOrders = await Order.find()
+        .populate("user", "name email")
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .select("orderNumber total status createdAt user");
+
+      // Get orders by month (last 6 months)
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+      const ordersByMonth = await Order.aggregate([
+        { $match: { createdAt: { $gte: sixMonthsAgo } } },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            count: { $sum: 1 },
+            revenue: { $sum: "$total" }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ]);
+
+      res.json({
+        totalOrders,
+        totalRevenue: totalRevenue[0]?.total || 0,
+        ordersByStatus,
+        recentOrders,
+        ordersByMonth
+      });
+    } catch (error) {
+      console.error("Get order analytics error:", error);
+      res.status(500).json({ error: "Failed to fetch order analytics" });
+    }
+  },
+);
+
 // Get single order (must be after all specific routes)
 router.get(
   "/:orderId",
@@ -430,102 +494,6 @@ router.put(
     } catch (error) {
       console.error("Update order tracking error:", error);
       res.status(500).json({ error: "Failed to update order tracking" });
-    }
-  },
-);
-
-// Get single order details (admin only)
-router.get(
-  "/:orderId",
-  authenticateToken,
-  requireAdmin,
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { orderId } = req.params;
-
-      if (!getConnectionStatus()) {
-        res.status(503).json({ error: "Database connection required" });
-        return;
-      }
-
-      const order = await Order.findById(orderId)
-        .populate("user", "name email phone")
-        .populate("items.product", "name price images slug")
-        .select("-__v");
-
-      if (!order) {
-        res.status(404).json({ error: "Order not found" });
-        return;
-      }
-
-      res.json({ order });
-    } catch (error) {
-      console.error("Get order details error:", error);
-      res.status(500).json({ error: "Failed to fetch order details" });
-    }
-  },
-);
-
-// Get order analytics (admin only)
-router.get(
-  "/analytics",
-  authenticateToken,
-  requireAdmin,
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      if (!getConnectionStatus()) {
-        res.status(503).json({ error: "Database connection required" });
-        return;
-      }
-
-      // Get order statistics
-      const totalOrders = await Order.countDocuments();
-      const totalRevenue = await Order.aggregate([
-        { $match: { paymentStatus: "paid" } },
-        { $group: { _id: null, total: { $sum: "$total" } } }
-      ]);
-
-      // Get orders by status
-      const ordersByStatus = await Order.aggregate([
-        { $group: { _id: "$status", count: { $sum: 1 } } }
-      ]);
-
-      // Get recent orders
-      const recentOrders = await Order.find()
-        .populate("user", "name email")
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .select("orderNumber total status createdAt user");
-
-      // Get orders by month (last 6 months)
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
-      const ordersByMonth = await Order.aggregate([
-        { $match: { createdAt: { $gte: sixMonthsAgo } } },
-        {
-          $group: {
-            _id: {
-              year: { $year: "$createdAt" },
-              month: { $month: "$createdAt" }
-            },
-            count: { $sum: 1 },
-            revenue: { $sum: "$total" }
-          }
-        },
-        { $sort: { "_id.year": 1, "_id.month": 1 } }
-      ]);
-
-      res.json({
-        totalOrders,
-        totalRevenue: totalRevenue[0]?.total || 0,
-        ordersByStatus,
-        recentOrders,
-        ordersByMonth
-      });
-    } catch (error) {
-      console.error("Get order analytics error:", error);
-      res.status(500).json({ error: "Failed to fetch order analytics" });
     }
   },
 );

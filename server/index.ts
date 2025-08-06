@@ -14,6 +14,11 @@ import checkoutRoutes from "./routes/checkout";
 import reviewRoutes from "./routes/reviews";
 import analyticsRoutes from "./routes/analytics";
 import shiprocketRoutes from "./routes/shiprocketRoutes";
+import searchRoutes from "./routes/search";
+import addressRoutes from "./routes/addresses";
+import settingsRoutes from "./routes/settings";
+import usersRoutes from "./routes/users";
+import inventoryRoutes from "./routes/inventory";
 
 export function createServer() {
   const app = express();
@@ -143,6 +148,16 @@ export function createServer() {
     next();
   });
 
+  // Serve uploaded files (avatars, etc.)
+  app.use('/uploads', express.static('uploads', {
+    maxAge: '1d', // Cache uploaded images for 1 day
+    setHeaders: (res, path) => {
+      if (path.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        res.setHeader('Cache-Control', 'public, max-age=86400'); // 1 day
+      }
+    }
+  }));
+
   // Session middleware
   app.use(
     session({
@@ -192,8 +207,23 @@ export function createServer() {
   // Review routes
   app.use("/api/reviews", reviewRoutes);
 
+  // Search routes
+  app.use("/api/search", searchRoutes);
+
+  // Address routes
+  app.use("/api/addresses", addressRoutes);
+
+  // User settings routes
+  app.use("/api/settings", settingsRoutes);
+
   // Analytics routes
   app.use("/api/analytics", analyticsRoutes);
+
+  // Users management routes (admin only)
+  app.use("/api/users", usersRoutes);
+
+  // Inventory management routes (admin only)
+  app.use("/api/inventory", inventoryRoutes);
 
   // Shiprocket routes
   app.use("/api/shiprocket", shiprocketRoutes);

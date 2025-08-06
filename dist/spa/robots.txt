@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kitilocks.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /admin
+Disallow: /api/
+Disallow: /.env
+Disallow: /server/
+
+# Crawl delay
+Crawl-delay: 1

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -33,6 +33,12 @@ import { useWishlist } from "@/contexts/WishlistContext";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { itemsCount: cartItemsCount } = useCart();
   const { itemsCount: wishlistCount } = useWishlist();
@@ -40,6 +46,62 @@ export default function Navigation() {
   const handleLogout = () => {
     logout();
     setIsMenuOpen(false);
+  };
+
+  // Search functionality
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.suggestions || []);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    // Debounce search
+    searchTimeoutRef.current = setTimeout(() => {
+      handleSearch(value);
+    }, 300);
+  };
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
+
+  const handleSelectSearchResult = (result: any) => {
+    if (result.type === 'product') {
+      navigate(`/products/${result.slug || result.name.toLowerCase().replace(/\s+/g, '-')}`);
+    } else if (result.type === 'category') {
+      navigate(`/products?category=${encodeURIComponent(result.name)}`);
+    } else {
+      navigate(`/products?search=${encodeURIComponent(result.name)}`);
+    }
+    setIsSearchOpen(false);
+    setSearchQuery("");
   };
 
   const navLinks = [
@@ -77,12 +139,80 @@ export default function Navigation() {
           {/* Search Bar - Desktop */}
           <div className="hidden lg:flex flex-1 max-w-xs xl:max-w-md mx-6 xl:mx-8">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-              <input
-                type="search"
-                placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 z-10" />
+              <form onSubmit={handleSearchSubmit}>
+                <input
+                  type="search"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onFocus={() => setIsSearchOpen(true)}
+                  onBlur={() => setTimeout(() => setIsSearchOpen(false), 200)}
+                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </form>
+              
+              {/* Search Results Dropdown */}
+              {isSearchOpen && (searchResults.length > 0 || searchQuery) && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                  {isSearching ? (
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      Searching...
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <>
+                      <div className="p-2">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                          Search Results
+                        </div>
+                        {searchResults?.slice(0, 8).map((result, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleSelectSearchResult(result)}
+                            className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center justify-between"
+                          >
+                            <div className="flex flex-col items-start">
+                              <span className="text-sm font-medium">{result.name}</span>
+                              {result.price && (
+                                <span className="text-xs text-gray-500">₹{result.price}</span>
+                              )}
+                            </div>
+                            <Badge variant="secondary" className="text-xs">
+                              {result.type}
+                            </Badge>
+                          </button>
+                        ))}
+                      </div>
+                      {searchQuery && (
+                        <div className="border-t p-2">
+                          <button
+                            onClick={() => handleSearchSubmit()}
+                            className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer font-medium flex items-center"
+                          >
+                            <Search className="w-4 h-4 mr-2" />
+                            Search for "{searchQuery}"
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : searchQuery ? (
+                    <div className="p-4 text-center">
+                      <p className="text-sm text-gray-500 mb-2">No results found</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSearchSubmit()}
+                      >
+                        Search for "{searchQuery}"
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      Start typing to search...
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -153,12 +283,6 @@ export default function Navigation() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/wishlist" className="cursor-pointer">
                       <Heart className="mr-2 h-4 w-4" />
@@ -248,14 +372,44 @@ export default function Navigation() {
                 <div className="flex-1 overflow-y-auto">
                   {/* Search Bar */}
                   <div className="p-4 xs:p-6 border-b border-slate-100">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                      <input
-                        type="search"
-                        placeholder="Search products..."
-                        className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-slate-50 focus:bg-white transition-colors"
-                      />
-                    </div>
+                    <form onSubmit={handleSearchSubmit}>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                        <input
+                          type="search"
+                          placeholder="Search products..."
+                          value={searchQuery}
+                          onChange={(e) => handleSearchChange(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-slate-50 focus:bg-white transition-colors"
+                        />
+                      </div>
+                    </form>
+                    
+                    {/* Mobile Search Results */}
+                    {searchResults?.length > 0 && (
+                      <div className="mt-3 bg-white border rounded-lg shadow-sm max-h-48 overflow-y-auto">
+                        {searchResults?.slice(0, 5).map((result, index) => (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              handleSelectSearchResult(result);
+                              setIsMenuOpen(false);
+                            }}
+                            className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center justify-between border-b last:border-b-0"
+                          >
+                            <div className="flex flex-col items-start">
+                              <span className="text-sm font-medium">{result.name}</span>
+                              {result.price && (
+                                <span className="text-xs text-gray-500">₹{result.price}</span>
+                              )}
+                            </div>
+                            <Badge variant="secondary" className="text-xs">
+                              {result.type}
+                            </Badge>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Quick Actions */}
@@ -329,12 +483,12 @@ export default function Navigation() {
                       </div>
                       <div className="space-y-1">
                         <Link
-                          to="/profile"
+                          to="/settings"
                           onClick={() => setIsMenuOpen(false)}
                           className="flex items-center space-x-3 p-3 rounded-lg text-slate-700 hover:bg-white hover:text-blue-700 transition-colors"
                         >
-                          <User className="w-4 h-4" />
-                          <span className="text-sm font-medium">Profile</span>
+                          <Settings className="w-4 h-4" />
+                          <span className="text-sm font-medium">Settings</span>
                         </Link>
                         <Link
                           to="/orders"
