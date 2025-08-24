@@ -19,6 +19,7 @@ import {
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
+import SEO from "@/components/SEO";
 
 interface Product {
   _id: string;
@@ -265,8 +266,28 @@ export default function Index() {
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
 
+  const homeStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Kiti Store",
+    "url": "https://kitistore.com",
+    "description": "Premium modular kitchen hardware manufacturer in India",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://kitistore.com/products?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <SEO
+        title="Kiti Store – Premium Modular Kitchen Hardware India"
+        description="Explore luxury kitchen hardware by Kiti Store – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more. Premium modular kitchen solutions for Indian homes."
+        keywords="kitchen hardware, modular kitchen India, soft close channels, lift up hardware, Kiti Store, Khuntia Enterprises, hydraulic hinges, premium kitchen accessories"
+        structuredData={homeStructuredData}
+      />
+      <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100">
         <div className="absolute inset-0">
@@ -718,5 +739,6 @@ export default function Index() {
         </div>
       </section>
     </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
@@ -53,18 +54,17 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <GoogleOAuthProvider clientId={googleClientId}>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <PerformanceMonitor />
-              <ErrorBoundary>
-                <AuthProvider>
-                  <CartProvider>
-                    <WishlistProvider>
-                      <Routes>
+      <HelmetProvider>
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <BrowserRouter>
+                <ErrorBoundary>
+                  <PerformanceMonitor />
+                  <AuthProvider>
+                    <CartProvider>
+                      <WishlistProvider>
+                        <Routes>
                         {/* Auth routes - no layout */}
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
@@ -131,6 +131,9 @@ const App = () => {
           </TooltipProvider>
         </QueryClientProvider>
       </GoogleOAuthProvider>
+      <Toaster />
+      <Sonner />
+      </HelmetProvider>
     </ErrorBoundary>
   );
 };

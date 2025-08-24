@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import SEO from "@/components/SEO";
 import {
   Select,
   SelectContent,
@@ -545,6 +546,25 @@ export default function Products() {
 
   const allTags = Array.from(new Set(products?.flatMap((p) => p.tags) || []));
 
+  // SEO data based on current filters
+  const getPageTitle = () => {
+    if (filters.search) return `Search Results for "${filters.search}" | Kitchen Hardware`;
+    if (filters.category) {
+      const categoryName = categories.find(c => c.slug === filters.category)?.name;
+      return `${categoryName} - Premium Kitchen Hardware | Kiti Store`;
+    }
+    return "Premium Kitchen Hardware & Modular Accessories | Kiti Store";
+  };
+
+  const getPageDescription = () => {
+    if (filters.search) return `Find premium kitchen hardware for "${filters.search}". Explore our collection of soft-close channels, hydraulic hinges, and lift-up systems.`;
+    if (filters.category) {
+      const categoryName = categories.find(c => c.slug === filters.category)?.name;
+      return `Browse our premium ${categoryName} collection. High-quality modular kitchen hardware with soft-close technology and durable finishes.`;
+    }
+    return "Discover premium kitchen hardware including hydraulic hinges, soft-close channels, lift-up systems, and modular accessories. Quality guaranteed by Kiti Store.";
+  };
+
   const handleAddToCart = async (product: Product) => {
     if (!isAuthenticated) {
       toast.error("Please sign in to add items to your cart", {
@@ -773,7 +793,13 @@ export default function Products() {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <SEO
+        title={getPageTitle()}
+        description={getPageDescription()}
+        keywords="kitchen hardware products, soft close channels, hydraulic hinges, lift up systems, modular kitchen accessories, premium hardware India"
+      />
+      <div className="min-h-screen bg-white">
       {/* Clean Container */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Simple Search and Controls */}
@@ -1330,5 +1356,6 @@ export default function Products() {
         </div>
       </div>
     </div>
+    </>
   );
 }

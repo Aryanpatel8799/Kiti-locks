@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import SEO from "@/components/SEO";
 import {
   Mail,
   Phone,
@@ -98,7 +101,13 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <SEO
+        title="Contact Us - Get In Touch | Kiti Store"
+        description="Contact Kiti Store for premium kitchen hardware support. Email, phone, or visit our showroom. Expert customer service for modular kitchen solutions."
+        keywords="contact Kiti Store, kitchen hardware support, customer service, kitchen hardware dealer contact, modular kitchen help"
+      />
+      <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 py-24">
         <div className="absolute inset-0">
@@ -182,10 +191,8 @@ export default function Contact() {
       </section>
 
       {/* Contact Form & Info */}
- 
-
-      {/* Location Map Placeholder */}
-      
+  
     </div>
+    </>
   );
 }
