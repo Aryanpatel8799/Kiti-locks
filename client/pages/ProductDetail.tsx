@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import ProductReviews from "@/components/ProductReviews";
 
 interface Product {
@@ -44,6 +45,8 @@ interface Product {
   status: string;
   featured: boolean;
   tags: string[];
+  averageRating: number;
+  reviewCount: number;
   variants: Array<{
     name: string;
     value: string;
@@ -64,6 +67,7 @@ export default function ProductDetail() {
   >({});
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   useEffect(() => {
     if (slug) {
@@ -177,6 +181,32 @@ export default function ProductDetail() {
       toast.success(`${product.name} added to cart!`);
     } catch (error: any) {
       toast.error(error.message || "Failed to add item to cart");
+    }
+  };
+
+  const handleToggleWishlist = async () => {
+    if (!product) return;
+
+    if (!isAuthenticated) {
+      toast.error("Please sign in to add items to your wishlist", {
+        action: {
+          label: "Sign In",
+          onClick: () => (window.location.href = "/login"),
+        },
+      });
+      return;
+    }
+
+    try {
+      await toggleWishlist(product._id);
+      const isInWishlistNow = isInWishlist(product._id);
+      toast.success(
+        isInWishlistNow
+          ? `${product.name} removed from wishlist`
+          : `${product.name} added to wishlist!`,
+      );
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update wishlist");
     }
   };
 
@@ -306,14 +336,30 @@ export default function ProductDetail() {
                 {product.name}
               </h1>
 
-              {/* Rating placeholder */}
+              {/* Rating */}
               <div className="flex items-center space-x-2 mb-4">
                 <div className="flex text-yellow-400">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-current" />
+                    <Star 
+                      key={i} 
+                      className={`w-4 h-4 ${
+                        i < Math.round(product.averageRating || 0)
+                          ? "fill-current"
+                          : "text-gray-300"
+                      }`} 
+                    />
                   ))}
                 </div>
-                <span className="text-sm text-slate-600">(23 reviews)</span>
+                <span className="text-sm text-slate-600">
+                  {product.averageRating ? (
+                    <>
+                      {product.averageRating.toFixed(1)} 
+                      ({product.reviewCount} {product.reviewCount === 1 ? 'review' : 'reviews'})
+                    </>
+                  ) : (
+                    'No reviews yet'
+                  )}
+                </span>
               </div>
 
               {/* Price */}
@@ -430,9 +476,19 @@ export default function ProductDetail() {
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
               </Button>
-              <Button variant="outline" className="w-full h-12 text-base sm:text-lg">
-                <Heart className="w-5 h-5 mr-2" />
-                Add to Wishlist
+              <Button 
+                variant="outline" 
+                className={`w-full h-12 text-base sm:text-lg ${
+                  isInWishlist(product._id) 
+                    ? "border-red-300 text-red-600 hover:bg-red-50" 
+                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+                onClick={handleToggleWishlist}
+              >
+                <Heart className={`w-5 h-5 mr-2 ${
+                  isInWishlist(product._id) ? "fill-current" : ""
+                }`} />
+                {isInWishlist(product._id) ? "Remove from Wishlist" : "Add to Wishlist"}
               </Button>
             </div>
 

@@ -6,8 +6,10 @@ import { createServer } from "./server";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
-    port: 8080,
+   host: true,
+    port: 8081,         // or 8080 if using middleware—must match reality
+    strictPort: true,
+    allowedHosts: ['kitistore.com','www.kitistore.com']
   },
   build: {
     outDir: "dist/spa",
