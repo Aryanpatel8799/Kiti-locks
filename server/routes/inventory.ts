@@ -164,7 +164,6 @@ router.put(
       await product.save();
 
       // Log the inventory change (in a real app, you'd have an InventoryLog model)
-      console.log(`Inventory Update: ${product.name} stock changed from ${oldStock} to ${quantity}. Reason: ${reason}. Notes: ${notes || 'None'}`);
 
       res.json({
         message: "Stock updated successfully",
@@ -235,7 +234,6 @@ router.put(
           });
 
           // Log the inventory change
-          console.log(`Bulk Inventory Update: ${product.name} stock changed from ${oldStock} to ${update.quantity}. Reason: ${update.reason}`);
         } catch (error) {
           results.push({
             productId: update.productId,

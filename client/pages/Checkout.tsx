@@ -66,7 +66,6 @@ export default function Checkout() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("📦 Order data received:", data);
         setOrder(data.order || data); // Handle both { order: ... } and direct order object
         clearCart(); // Clear cart after successful order
       } else {

@@ -69,7 +69,6 @@ export default function AnalyticsDashboard({}: AnalyticsDashboardProps) {
       
       // Check authentication status
       if (!isAuthenticated || user?.role !== "admin") {
-        console.log('User not authenticated or not admin:', { isAuthenticated, role: user?.role });
         setLoading(false);
         return;
       }

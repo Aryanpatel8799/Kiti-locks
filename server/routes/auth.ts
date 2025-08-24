@@ -92,7 +92,6 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
 
 router.post("/login", async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log("Login attempt for email:", req.body.email);
     const { email, password, twoFactorToken } = req.body;
 
     // Validate input
@@ -329,7 +328,6 @@ router.get(
 
 router.post("/google", async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log("Google OAuth login attempt");
     const { credential } = req.body;
 
     if (!credential) {

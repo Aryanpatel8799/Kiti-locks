@@ -44,7 +44,8 @@ export default function RazorpayPaymentForm({
     contact: customerInfo.contact || "",
   });
 
-  console.log("Payment form initialized with currency:", currency, "orderId:", orderId); // Use the props to avoid warnings
+  // Payment form initialized with currency and orderId
+  // Used props: currency, orderId
 
   const handlePayment = async () => {
     try {
@@ -112,18 +113,7 @@ export default function RazorpayPaymentForm({
         order_id: orderData.orderId,
         handler: async (response: any) => {
           try {
-            console.log("🔍 Frontend payment data:", {
-              shippingAddress,
-              billingDetails,
-              cartItems: cartItems?.length || 0,
-              cartItemsSample: cartItems?.[0] || "none",
-              mappedOrderItems: cartItems?.map(item => ({
-                product: item.product?._id || item._id,
-                name: item.product?.name || item.name,
-                quantity: item.quantity,
-                price: item.product?.price || item.price,
-              })).slice(0, 2) || [] // Show first 2 items for debugging
-            });
+
 
             // Prepare order items from cart or create fallback
             const preparedOrderItems = cartItems && cartItems.length > 0 
@@ -143,7 +133,6 @@ export default function RazorpayPaymentForm({
                   image: "/placeholder.svg"
                 }];
 
-            console.log("📦 Prepared order items:", preparedOrderItems);
 
             // Send payment details to backend for verification and order creation
             const verifyResponse = await fetch("/api/checkout/razorpay-success", {
@@ -217,7 +206,6 @@ export default function RazorpayPaymentForm({
         },
         modal: {
           ondismiss: () => {
-            console.log("Payment modal dismissed/cancelled");
             setIsProcessing(false);
             if (onCancel) {
               onCancel();

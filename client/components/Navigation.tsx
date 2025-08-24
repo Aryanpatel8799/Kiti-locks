@@ -63,7 +63,7 @@ export default function Navigation() {
         setSearchResults(data.suggestions || []);
       }
     } catch (error) {
-      console.error('Search error:', error);
+      // Search error - silently handle
     } finally {
       setIsSearching(false);
     }

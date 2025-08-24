@@ -63,19 +63,18 @@ export default function Index() {
 
   const fetchHomeData = async () => {
     try {
-      console.log("Fetching home data...");
+      // Fetching home data...
 
       // Test API connectivity first
       try {
         const pingRes = await fetch("/api/ping");
         if (pingRes.ok) {
-          const pingData = await pingRes.json();
-          console.log("✅ API connectivity test passed:", pingData.message);
+          await pingRes.json(); // API connectivity test passed
         } else {
-          console.warn("⚠️ API ping failed with status:", pingRes.status);
+          // API ping failed with status
         }
       } catch (pingError) {
-        console.error("❌ API ping failed:", pingError);
+        // API ping failed
       }
 
       // Mock data fallback for demo purposes
@@ -166,17 +165,14 @@ export default function Index() {
         const productsRes = await fetch("/api/products?featured=true&limit=8");
         if (productsRes.ok) {
           productsData = await productsRes.json();
-          console.log("Products data:", productsData);
+          // Products data loaded successfully
           setFeaturedProducts(productsData.products || mockProducts);
         } else {
-          console.warn(
-            "Products API returned non-ok status, using mock data:",
-            productsRes.status,
-          );
+          // Products API returned non-ok status, using mock data
           setFeaturedProducts(mockProducts);
         }
       } catch (productsError) {
-        console.error("Products fetch error, using mock data:", productsError);
+        // Products fetch error, using mock data
         setFeaturedProducts(mockProducts);
       }
 
@@ -186,24 +182,18 @@ export default function Index() {
         const categoriesRes = await fetch("/api/categories?featured=true");
         if (categoriesRes.ok) {
           categoriesData = await categoriesRes.json();
-          console.log("Categories data:", categoriesData);
+          // Categories data loaded successfully
           setFeaturedCategories(categoriesData.categories || mockCategories);
         } else {
-          console.warn(
-            "Categories API returned non-ok status, using mock data:",
-            categoriesRes.status,
-          );
+          // Categories API returned non-ok status, using mock data
           setFeaturedCategories(mockCategories);
         }
       } catch (categoriesError) {
-        console.error(
-          "Categories fetch error, using mock data:",
-          categoriesError,
-        );
+        // Categories fetch error, using mock data
         setFeaturedCategories(mockCategories);
       }
     } catch (error) {
-      console.error("Error fetching home data:", error);
+      // Error fetching home data
       // Set fallback data for demo
       setFeaturedProducts([]);
       setFeaturedCategories([]);

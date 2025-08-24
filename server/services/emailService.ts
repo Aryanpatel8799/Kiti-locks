@@ -226,9 +226,7 @@ class NodemailerEmailService implements EmailService {
         html,
       });
 
-      console.log(
-        `Order confirmation email sent to ${orderData.customerEmail} for order ${orderData.orderId}`,
-      );
+   
     } catch (error) {
       console.error("Failed to send order confirmation email:", error);
       // Don't throw error to avoid blocking the order process
@@ -253,9 +251,7 @@ class NodemailerEmailService implements EmailService {
         html,
       });
 
-      console.log(
-        `Order shipped email sent to ${orderData.customerEmail} for order ${orderData.orderId}`,
-      );
+    
     } catch (error) {
       console.error("Failed to send order shipped email:", error);
     }
@@ -275,9 +271,7 @@ class NodemailerEmailService implements EmailService {
         html,
       });
 
-      console.log(
-        `Order delivered email sent to ${orderData.customerEmail} for order ${orderData.orderId}`,
-      );
+    
     } catch (error) {
       console.error("Failed to send order delivered email:", error);
     }
@@ -287,28 +281,20 @@ class NodemailerEmailService implements EmailService {
 // Mock email service for development/testing
 class MockEmailService implements EmailService {
   async sendOrderConfirmation(orderData: OrderEmailData): Promise<void> {
-    console.log(
-      `[MOCK EMAIL] Order confirmation sent to ${orderData.customerEmail} for order ${orderData.orderId}`,
-    );
-    console.log("Order data:", JSON.stringify(orderData, null, 2));
+  
   }
 
   async sendOrderShipped(
     orderData: OrderEmailData,
     trackingNumber?: string,
   ): Promise<void> {
-    console.log(
-      `[MOCK EMAIL] Order shipped notification sent to ${orderData.customerEmail} for order ${orderData.orderId}`,
-    );
+   
     if (trackingNumber) {
-      console.log(`Tracking number: ${trackingNumber}`);
     }
   }
 
   async sendOrderDelivered(orderData: OrderEmailData): Promise<void> {
-    console.log(
-      `[MOCK EMAIL] Order delivered notification sent to ${orderData.customerEmail} for order ${orderData.orderId}`,
-    );
+   
   }
 }
 

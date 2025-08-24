@@ -34,14 +34,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const getAccessToken = () => localStorage.getItem("accessToken");
   const getRefreshToken = () => localStorage.getItem("refreshToken");
   const setTokens = (accessToken: string, refreshToken: string) => {
-    console.log("💾 Storing tokens in localStorage");
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
     // Also set 'token' for backward compatibility
     localStorage.setItem("token", accessToken);
   };
   const clearTokens = () => {
-    console.log("🗑️ Clearing tokens from localStorage");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("token");
@@ -78,9 +76,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const abortController = new AbortController();
 
     const initAuth = async () => {
-      console.log("🔍 Starting auth initialization...");
       const token = getAccessToken();
-      console.log("🔑 Token from localStorage:", token ? `Present (${token.substring(0, 20)}...)` : "Missing");
       
       if (token && isValidTokenFormat(token)) {
         try {
@@ -92,13 +88,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
             signal: abortController.signal,
           });
 
-          console.log("/api/auth/me response status:", response.status); // <-- log status
 
           if (!isMounted) return;
 
           if (response.ok) {
             const data = await response.json();
-            console.log("/api/auth/me user data:", data); // <-- log user data
             if (isMounted) {
               setUser(data.user);
             }
@@ -116,13 +110,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
                   signal: abortController.signal,
                 });
 
-                console.log("/api/auth/refresh response status:", refreshResponse.status); // <-- log status
 
                 if (!isMounted) return;
 
                 if (refreshResponse.ok) {
                   const refreshData = await refreshResponse.json();
-                  console.log("/api/auth/refresh data:", refreshData); // <-- log refresh data
                   if (isMounted) {
                     setTokens(
                       refreshData.tokens.accessToken,
@@ -138,11 +130,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
                       signal: abortController.signal,
                     });
 
-                    console.log("/api/auth/me after refresh status:", userResponse.status); // <-- log status
 
                     if (userResponse.ok && isMounted) {
                       const userData = await userResponse.json();
-                      console.log("/api/auth/me after refresh user data:", userData); // <-- log user data
                       setUser(userData.user);
                     }
                   }
@@ -191,12 +181,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
           // For network errors, keep existing tokens and try again later
           console.warn("Auth initialization error:", error);
-          console.log("Auth initialization error details:", error); // <-- log error details
         }
       }
 
       if (isMounted) {
-        console.log("✅ Auth initialization complete, setting loading to false");
         setLoading(false);
       }
     };

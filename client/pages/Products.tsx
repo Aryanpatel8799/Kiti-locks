@@ -158,7 +158,7 @@ export default function Products() {
           fetchFilterOptions(),
         ]);
       } catch (error) {
-        console.error("Error initializing product data:", error);
+        // Error initializing product data
       }
     };
 
@@ -167,7 +167,9 @@ export default function Products() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      fetchProducts().catch(console.error);
+      fetchProducts().catch(() => {
+        // Silently handle fetch errors
+      });
     }, 100); // Small delay to prevent rapid API calls
 
     return () => clearTimeout(timeoutId);
@@ -185,11 +187,7 @@ export default function Products() {
         hasFullStoryInFetch || hasFullStoryScript || hasFullStoryInWindow;
 
       if (interference) {
-        console.log("FullStory interference detected:", {
-          hasFullStoryInFetch,
-          hasFullStoryScript,
-          hasFullStoryInWindow,
-        });
+    
       }
 
       return interference;
@@ -205,7 +203,6 @@ export default function Products() {
   ): Promise<Response> => {
     // If FullStory is detected, skip fetch entirely and use XMLHttpRequest
     if (isFullStoryInterference()) {
-      console.log("FullStory detected, using XMLHttpRequest for:", url);
       return xmlHttpRequestFetch(url, options);
     }
 
@@ -300,7 +297,7 @@ export default function Products() {
           throw new Error("Server connectivity test failed");
         }
       } catch (pingError) {
-        console.warn("API connectivity test failed, proceeding with request");
+        // API connectivity test failed, proceeding with request
       }
 
       const params = new URLSearchParams();
@@ -331,8 +328,7 @@ export default function Products() {
       params.append("limit", "50");
 
       const url = `/api/products?${params}`;
-      console.log('Fetching products with URL:', url);
-      console.log('Current filters:', filters);
+      // Debug logs removed for production
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -369,19 +365,19 @@ export default function Products() {
           limit: 12,
         });
       } else {
-        console.error("Products API response not ok:", response.status);
+        // Products API response not ok
         const errorText = await response.text().catch(() => "Unknown error");
         setError(`API error (${response.status}): ${errorText.slice(0, 100)}`);
         setProducts([]);
       }
     } catch (error) {
-      console.error("Error fetching products:", error);
+      // Error fetching products
 
       // Better error handling with retry logic and fallback data
       if (error instanceof Error) {
         if (error.name === "AbortError" || error.message.includes("abort")) {
           if (retryCount < 2) {
-            console.log(`Request timed out, retrying... (${retryCount + 1}/2)`);
+            // Request timed out, retrying...
             setTimeout(() => fetchProducts(retryCount + 1), 2000);
             return;
           }
@@ -396,11 +392,11 @@ export default function Products() {
           error.message.includes("XMLHttpRequest")
         ) {
           if (retryCount < 1) {
-            console.log(`Network error, retrying... (${retryCount + 1}/1)`);
+            // Network error, retrying...
             setTimeout(() => fetchProducts(retryCount + 1), 1000);
             return;
           }
-          console.log("Network failed, clearing products for demo");
+          // Network failed, clearing products for demo
           setError(
             "Network temporarily unavailable. Please try refreshing the page.",
           );
@@ -466,12 +462,7 @@ export default function Products() {
   const updateFilters = (newFilters: Partial<Filters>) => {
     const updated = { ...filters, ...newFilters };
     
-    // Debug logging for filter changes
-    console.log('Updating filters:', { 
-      previous: filters, 
-      new: newFilters, 
-      updated 
-    });
+    // Debug logging removed for production
     
     setFilters(updated);
 
@@ -658,7 +649,7 @@ export default function Products() {
             <Slider
               value={[filters.minPrice, filters.maxPrice]}
               onValueChange={([min, max]) => {
-                console.log('Price range changed:', { min, max });
+                // Price range changed
                 updateFilters({ minPrice: min, maxPrice: max });
               }}
               max={10000}
@@ -704,7 +695,7 @@ export default function Products() {
             <Slider
               value={[filters.minRating]}
               onValueChange={([rating]) => {
-                console.log('Rating changed:', rating);
+                // Rating changed
                 updateFilters({ minRating: rating });
               }}
               max={5}

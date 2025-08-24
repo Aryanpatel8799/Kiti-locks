@@ -21,11 +21,7 @@ let razorpay: Razorpay | null = null;
 const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
 const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
 
-console.log("Razorpay initialization:", {
-  keyIdProvided: !!razorpayKeyId,
-  keySecretProvided: !!razorpayKeySecret,
-  keyIdPrefix: razorpayKeyId?.substring(0, 8),
-});
+
 
 // Initialize Razorpay
 try {
@@ -34,13 +30,9 @@ try {
       key_id: razorpayKeyId,
       key_secret: razorpayKeySecret,
     });
-    console.log("✅ Razorpay initialized successfully");
   } else {
     console.warn("⚠️ Razorpay keys not provided, running in demo mode");
-    console.log("Missing keys:", {
-      RAZORPAY_KEY_ID: !razorpayKeyId,
-      RAZORPAY_KEY_SECRET: !razorpayKeySecret,
-    });
+
   }
 } catch (error) {
   console.error("❌ Razorpay initialization failed:", error);
@@ -237,25 +229,12 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
     } = req.body;
     const userId = (req as AuthRequest).user?.userId;
 
-    console.log("🔍 Razorpay success payload received:", {
-      razorpay_payment_id: !!razorpay_payment_id,
-      razorpay_order_id: !!razorpay_order_id,
-      razorpay_signature: !!razorpay_signature,
-      orderId: !!orderId,
-      itemsCount: items?.length || 0,
-      orderItemsCount: orderItems?.length || 0,
-      shippingAddress: shippingAddress ? Object.keys(shippingAddress) : 'undefined',
-      userId: userId || 'guest'
-    });
+
 
     // Use orderItems if available, fallback to items
     const finalItems = orderItems || items || [];
     
-    console.log("📦 Final items for processing:", {
-      finalItemsCount: finalItems.length,
-      sampleItem: finalItems[0] || "none",
-      allItemKeys: finalItems.length > 0 ? Object.keys(finalItems[0] || {}) : []
-    });
+
 
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
       return res.status(400).json({ error: "Missing payment details" });
@@ -353,20 +332,12 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
     });
 
     try {
-      console.log("💾 Attempting to save order:", {
-        orderNumber: `ORD-${Date.now()}`,
-        userId: userId || "guest",
-        itemsCount: orderItemsArray.length,
-        finalAmount,
-        shippingAddress: orderShippingAddress,
-      });
+ 
 
       await order.save();
-      console.log("✅ Order saved successfully:", order._id);
 
       // 🚚 Automatically create Shiprocket order after successful payment
       try {
-        console.log("🔗 Creating Shiprocket order for:", order._id);
         
         // Only create Shiprocket order if we have items
         if (orderItemsArray.length === 0) {
@@ -397,13 +368,6 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
             comment: `Order ${order.orderNumber} - ${orderShippingAddress.firstName} ${orderShippingAddress.lastName}`
           };
 
-          console.log("📦 Shiprocket order data prepared:", {
-            order_id: shiprocketOrderData.order_id,
-            itemsCount: shiprocketOrderData.items.length,
-            items: shiprocketOrderData.items,
-            customer_name: shiprocketOrderData.customer_name,
-            sub_total: shiprocketOrderData.sub_total
-          });
 
           const shiprocketOrder = await createShiprocketOrderWithDefaults(shiprocketOrderData);
 
@@ -413,11 +377,6 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
           order.order_created_on_shiprocket = true;
           await order.save();
 
-          console.log("✅ Shiprocket order created successfully:", {
-            orderId: order._id,
-            shipmentId: shiprocketOrder.shipment_id,
-            trackingUrl: shiprocketOrder.tracking_url
-          });
         }
 
       } catch (shiprocketError) {

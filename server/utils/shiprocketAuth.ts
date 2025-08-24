@@ -27,7 +27,6 @@ export const getShiprocketToken = async (): Promise<string> => {
 
     // Check if we have a valid cached token
     if (cachedToken && tokenExpiry && new Date() < tokenExpiry) {
-      console.log('✅ Using cached Shiprocket token');
       return cachedToken;
     }
 
@@ -69,7 +68,6 @@ export const getShiprocketToken = async (): Promise<string> => {
       return cachedToken;
     }
 
-    console.log('🔑 Attempting Shiprocket authentication...');
     lastLoginAttempt = new Date();
     loginAttemptCount++;
 
@@ -101,7 +99,6 @@ export const getShiprocketToken = async (): Promise<string> => {
       loginAttemptCount = 0;
       consecutiveFailures = 0;
       
-      console.log('✅ Shiprocket token obtained successfully');
       return cachedToken;
     } else {
       throw new Error('Invalid response from Shiprocket login API');
@@ -318,7 +315,6 @@ export const createShiprocketOrder = async (orderData: {
       payload
     );
 
-    console.log('✅ Shiprocket order created successfully:', response);
     return response;
   } catch (error: any) {
     console.error('❌ Failed to create Shiprocket order:', error);

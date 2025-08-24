@@ -185,7 +185,6 @@ export default function CheckoutForm() {
   const handlePaymentSuccess = async (paymentData: any) => {
     try {
       setLoading(true);
-      console.log("✅ Payment successful, order already created via Razorpay handler:", paymentData);
       
       // Order is already created by the Razorpay success handler
       // Just navigate to success page
