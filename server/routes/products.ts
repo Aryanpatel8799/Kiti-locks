@@ -49,7 +49,7 @@ const productSchema = z.object({
       description: z.string().optional(),
     })
     .default({}),
-  // New Kiti Locks specific fields
+  // New Kiti Store specific fields
   operationType: z.enum(["Soft Close", "Non-Soft Close"]).optional(),
   productCode: z.string().optional(),
   usageArea: z.enum(["Kitchen", "Wardrobe", "Drawer", "Overhead"]).optional(),
@@ -153,7 +153,7 @@ router.get(
         filter.averageRating = { $gte: Number(minRating) };
       }
 
-      // New Kiti Locks filters
+      // New Kiti Store filters
       if (operationType) {
         filter.operationType = operationType;
       }

@@ -48,7 +48,7 @@ export default function Login() {
               <span className="text-white font-bold text-lg">K</span>
             </div>
             <span className="text-2xl font-bold text-slate-900">
-              Kiti Locks
+              Kiti Store
             </span>
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">

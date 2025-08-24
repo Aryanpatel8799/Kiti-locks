@@ -6,7 +6,7 @@ import connectDB from "../config/database";
 
 const seedData = async () => {
   try {
-    console.log("🌱 Starting Kiti Locks kitchen hardware database seed...");
+    console.log("🌱 Starting Kiti Store kitchen hardware database seed...");
 
     // Connect to database
     await connectDB();
@@ -21,7 +21,7 @@ const seedData = async () => {
     // Create admin user
     const adminUser = new User({
       name: "Pradeep Kumar Khuntia",
-      email: "admin@kitilocks.com",
+      email: "admin@KitiStore.com",
       password: "Admin123!",
       role: "admin",
     });
@@ -38,7 +38,7 @@ const seedData = async () => {
 
     console.log("👥 Created users");
 
-    // Create Kiti Locks product categories
+    // Create Kiti Store product categories
     const categories = [
       {
         name: "Soft Close Hinges",
@@ -91,9 +91,9 @@ const seedData = async () => {
     ];
 
     const createdCategories = await Category.insertMany(categories);
-    console.log("📁 Created Kiti Locks product categories");
+    console.log("📁 Created Kiti Store product categories");
 
-    // Create Kiti Locks catalog products
+    // Create Kiti Store catalog products
     const products = [
       // Soft Close Hinges Category
       {
@@ -868,9 +868,9 @@ const seedData = async () => {
     ];
 
     await Product.insertMany(products);
-    console.log("🔧 Created Kiti Locks catalog products");
+    console.log("🔧 Created Kiti Store catalog products");
 
-    console.log("✅ Kiti Locks catalog database seeded successfully!");
+    console.log("✅ Kiti Store catalog database seeded successfully!");
     console.log("\n📊 Summary:");
     console.log(`👥 Users: ${await User.countDocuments()}`);
     console.log(`📁 Categories: ${await Category.countDocuments()}`);

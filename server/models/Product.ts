@@ -40,7 +40,7 @@ export interface IProduct extends Document {
     title?: string;
     description?: string;
   };
-  // New Kiti Locks specific fields
+  // New Kiti Store specific fields
   operationType?: "Soft Close" | "Non-Soft Close";
   productCode?: string;
   usageArea?: "Kitchen" | "Wardrobe" | "Drawer" | "Overhead";
@@ -105,7 +105,7 @@ const productSchema = new Schema<IProduct>(
       title: { type: String, trim: true },
       description: { type: String, trim: true },
     },
-    // New Kiti Locks specific fields
+    // New Kiti Store specific fields
     operationType: {
       type: String,
       enum: ["Soft Close", "Non-Soft Close"],

@@ -155,7 +155,7 @@ router.get("/advanced", async (req: Request, res: Response) => {
       searchQuery.stock = { $gt: 0 };
     }
 
-    // Kiti Locks specific filters
+    // Kiti Store specific filters
     if (operationType) {
       searchQuery.operationType = operationType;
     }

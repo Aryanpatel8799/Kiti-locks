@@ -178,4 +178,4 @@ npm run format
 
 ## Conclusion
 
-Phase 2 significantly enhances the admin capabilities of the Kiti Locks e-commerce platform, providing powerful tools for inventory management, user administration, and business analytics. The modular architecture ensures easy maintenance and future extensibility.
+Phase 2 significantly enhances the admin capabilities of the Kiti Store e-commerce platform, providing powerful tools for inventory management, user administration, and business analytics. The modular architecture ensures easy maintenance and future extensibility.

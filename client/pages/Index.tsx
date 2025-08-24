@@ -337,7 +337,7 @@ export default function Index() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-slate-600 mb-6 xs:mb-8 sm:mb-10 max-w-xs xs:max-w-sm sm:max-w-2xl lg:max-w-3xl mx-auto leading-relaxed px-2 xs:px-4 sm:px-0"
             >
-              Premium Kitchen Hardware by Kiti Locks. Discover
+              Premium Kitchen Hardware by Kiti Store. Discover
               precision-engineered hydraulic hinges, soft-close channels,
               lift-up systems, and designer accessories for modern Indian
               kitchens.
@@ -395,7 +395,7 @@ export default function Index() {
             className="text-center mb-6 xs:mb-8 sm:mb-12 lg:mb-16"
           >
             <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-2 xs:mb-3 sm:mb-4">
-              Why Choose Kiti Locks?
+              Why Choose Kiti Store?
             </h2>
             <p className="text-sm xs:text-base sm:text-lg lg:text-xl text-slate-600 px-4 xs:px-6 sm:px-0 max-w-3xl mx-auto">
               World-class kitchen hardware that blends innovation, luxury, and

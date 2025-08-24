@@ -317,7 +317,7 @@ export default function Products() {
       if (filters.featured) params.append("featured", "true");
       if (filters.minRating > 0)
         params.append("minRating", filters.minRating.toString());
-      // New Kiti Locks filters
+      // New Kiti Store filters
       if (filters.operationType)
         params.append("operationType", filters.operationType);
       if (filters.usageArea) params.append("usageArea", filters.usageArea);
@@ -488,7 +488,7 @@ export default function Products() {
     if (updated.featured) params.set("featured", "true");
     if (updated.minRating > 0)
       params.set("minRating", updated.minRating.toString());
-    // New Kiti Locks filter params
+    // New Kiti Store filter params
     if (updated.operationType)
       params.set("operationType", updated.operationType);
     if (updated.usageArea) params.set("usageArea", updated.usageArea);

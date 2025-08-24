@@ -9,11 +9,11 @@ export default function Terms() {
   const sections = [
     {
       title: "Acceptance of Terms",
-      content: `By accessing and using Kiti Locks's website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.`,
+      content: `By accessing and using Kiti Store's website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.`,
     },
     {
       title: "Products and Services",
-      content: `Kiti Locks provides an online marketplace for bathroom hardware, fixtures, and accessories. We strive to provide accurate product descriptions, pricing, and availability information, but we do not warrant that product descriptions or other content is accurate, complete, reliable, current, or error-free.`,
+      content: `Kiti Store provides an online marketplace for bathroom hardware, fixtures, and accessories. We strive to provide accurate product descriptions, pricing, and availability information, but we do not warrant that product descriptions or other content is accurate, complete, reliable, current, or error-free.`,
     },
     {
       title: "Account Registration",
@@ -21,11 +21,11 @@ export default function Terms() {
     },
     {
       title: "Ordering and Payment",
-      content: `All orders are subject to acceptance by Kiti Locks. We reserve the right to refuse or cancel any order for any reason. Payment must be received before products are shipped. We accept major credit cards and other payment methods as indicated on our website.`,
+      content: `All orders are subject to acceptance by Kiti Store. We reserve the right to refuse or cancel any order for any reason. Payment must be received before products are shipped. We accept major credit cards and other payment methods as indicated on our website.`,
     },
     {
       title: "Shipping and Delivery",
-      content: `Shipping times are estimates and not guaranteed. Risk of loss and title for products purchased from Kiti Locks pass to you upon delivery to the carrier. We are not responsible for any delays caused by shipping carriers or other circumstances beyond our control.`,
+      content: `Shipping times are estimates and not guaranteed. Risk of loss and title for products purchased from Kiti Store pass to you upon delivery to the carrier. We are not responsible for any delays caused by shipping carriers or other circumstances beyond our control.`,
     },
     {
       title: "Returns and Refunds",
@@ -33,11 +33,11 @@ export default function Terms() {
     },
     {
       title: "Product Warranties",
-      content: `Products sold by Kiti Locks may include manufacturer warranties. We do not provide additional warranties beyond those offered by manufacturers. Any warranty claims should be directed to the manufacturer according to their warranty terms.`,
+      content: `Products sold by Kiti Store may include manufacturer warranties. We do not provide additional warranties beyond those offered by manufacturers. Any warranty claims should be directed to the manufacturer according to their warranty terms.`,
     },
     {
       title: "Limitation of Liability",
-      content: `Kiti Locks shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of our services.`,
+      content: `Kiti Store shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of our services.`,
     },
     {
       title: "Privacy Policy",
@@ -45,7 +45,7 @@ export default function Terms() {
     },
     {
       title: "Intellectual Property",
-      content: `All content on this website, including text, graphics, logos, images, and software, is the property of Kiti Locks or its content suppliers and is protected by copyright and other intellectual property laws.`,
+      content: `All content on this website, including text, graphics, logos, images, and software, is the property of Kiti Store or its content suppliers and is protected by copyright and other intellectual property laws.`,
     },
     {
       title: "Prohibited Uses",
@@ -61,7 +61,7 @@ export default function Terms() {
     },
     {
       title: "Contact Information",
-      content: `If you have any questions about these Terms of Service, please contact us at legal@Kiti Locks.com or by mail at: Kiti Locks Legal Department, 123 Hardware St, Design City, DC 12345.`,
+      content: `If you have any questions about these Terms of Service, please contact us at legal@Kiti Store.com or by mail at: Kiti Store Legal Department, 123 Hardware St, Design City, DC 12345.`,
     },
   ];
 
@@ -94,7 +94,7 @@ export default function Terms() {
             </h1>
             <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
               These terms and conditions outline the rules and regulations for
-              the use of Kiti Locks's website and services.
+              the use of Kiti Store's website and services.
             </p>
             <div className="flex items-center justify-center gap-2 text-sm text-slate-600">
               <AlertCircle className="w-4 h-4" />
@@ -124,8 +124,8 @@ export default function Terms() {
                       Agreement Overview
                     </h2>
                     <p className="text-slate-600 leading-relaxed">
-                      By using our website at Kiti Locks.com (the "Service")
-                      operated by Kiti Locks ("us", "we", or "our"), you are
+                      By using our website at Kiti Store.com (the "Service")
+                      operated by Kiti Store ("us", "we", or "our"), you are
                       agreeing to be bound by the following terms and conditions
                       ("Terms of Service", "Terms"). These Terms apply to all
                       visitors, users, and others who access or use the Service.
@@ -201,10 +201,10 @@ export default function Terms() {
                         Privacy Policy
                       </Link>
                       <a
-                        href="mailto:legal@Kiti Locks.com"
+                        href="mailto:legal@Kiti Store.com"
                         className="text-blue-600 hover:text-blue-700 font-medium"
                       >
-                        legal@Kiti Locks.com
+                        legal@Kiti Store.com
                       </a>
                     </div>
                   </div>

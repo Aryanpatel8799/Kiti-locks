@@ -41,27 +41,27 @@ function generateHTML(route, data = {}) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- SEO Meta Tags -->
-    <title>${title || "Kiti Locks – Premium Modular Kitchen Hardware India"}</title>
-    <meta name="description" content="${description || "Explore luxury kitchen hardware by Kiti Locks – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more. Premium modular kitchen solutions for Indian homes."}" />
-    <meta name="keywords" content="kitchen hardware, modular kitchen India, soft close channels, lift up hardware, Kiti Locks, Khuntia Enterprises, hydraulic hinges" />
-    <meta name="author" content="Kiti Locks - Khuntia Enterprises Pvt. Ltd." />
+    <title>${title || "Kiti Store – Premium Modular Kitchen Hardware India"}</title>
+    <meta name="description" content="${description || "Explore luxury kitchen hardware by Kiti Store – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more. Premium modular kitchen solutions for Indian homes."}" />
+    <meta name="keywords" content="kitchen hardware, modular kitchen India, soft close channels, lift up hardware, Kiti Store, Khuntia Enterprises, hydraulic hinges" />
+    <meta name="author" content="Kiti Store - Khuntia Enterprises Pvt. Ltd." />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="${canonical || "https://kitilocks.com" + route}" />
-    <meta property="og:title" content="${title || "Kiti Locks – Premium Modular Kitchen Hardware India"}" />
-    <meta property="og:description" content="${description || "Explore luxury kitchen hardware by Kiti Locks – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more."}" />
-    <meta property="og:image" content="${ogImage || "https://kitilocks.com/og-image.jpg"}" />
+    <meta property="og:url" content="${canonical || "https://KitiStore.com" + route}" />
+    <meta property="og:title" content="${title || "Kiti Store – Premium Modular Kitchen Hardware India"}" />
+    <meta property="og:description" content="${description || "Explore luxury kitchen hardware by Kiti Store – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more."}" />
+    <meta property="og:image" content="${ogImage || "https://KitiStore.com/og-image.jpg"}" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="${canonical || "https://kitilocks.com" + route}" />
-    <meta property="twitter:title" content="${title || "Kiti Locks – Premium Modular Kitchen Hardware India"}" />
-    <meta property="twitter:description" content="${description || "Explore luxury kitchen hardware by Kiti Locks – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more."}" />
-    <meta property="twitter:image" content="${ogImage || "https://kitilocks.com/og-image.jpg"}" />
+    <meta property="twitter:url" content="${canonical || "https://KitiStore.com" + route}" />
+    <meta property="twitter:title" content="${title || "Kiti Store – Premium Modular Kitchen Hardware India"}" />
+    <meta property="twitter:description" content="${description || "Explore luxury kitchen hardware by Kiti Store – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more."}" />
+    <meta property="twitter:image" content="${ogImage || "https://KitiStore.com/og-image.jpg"}" />
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="${canonical || "https://kitilocks.com" + route}" />
+    <link rel="canonical" href="${canonical || "https://KitiStore.com" + route}" />
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -102,22 +102,22 @@ function generateHTML(route, data = {}) {
 // Page-specific data
 const pageData = {
   "/": {
-    title: "Kiti Locks – Premium Modular Kitchen Hardware India",
+    title: "Kiti Store – Premium Modular Kitchen Hardware India",
     description:
-      "Explore luxury kitchen hardware by Kiti Locks – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more. Premium modular kitchen solutions for Indian homes.",
+      "Explore luxury kitchen hardware by Kiti Store – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more. Premium modular kitchen solutions for Indian homes.",
   },
   "/about": {
-    title: "About Kiti Locks – Pradeep Kumar Khuntia | Kitchen Hardware India",
+    title: "About Kiti Store – Pradeep Kumar Khuntia | Kitchen Hardware India",
     description:
-      "Learn about Kiti Locks founder Pradeep Kumar Khuntia and our mission to provide premium modular kitchen hardware solutions across India.",
+      "Learn about Kiti Store founder Pradeep Kumar Khuntia and our mission to provide premium modular kitchen hardware solutions across India.",
   },
   "/contact": {
-    title: "Contact Kiti Locks – Kitchen Hardware Support India",
+    title: "Contact Kiti Store – Kitchen Hardware Support India",
     description:
-      "Get in touch with Kiti Locks for premium kitchen hardware solutions. Expert support for modular kitchen projects across India.",
+      "Get in touch with Kiti Store for premium kitchen hardware solutions. Expert support for modular kitchen projects across India.",
   },
   "/products": {
-    title: "Kitchen Hardware Products – Kiti Locks Premium Range India",
+    title: "Kitchen Hardware Products – Kiti Store Premium Range India",
     description:
       "Browse our complete range of kitchen hardware products including soft-close hinges, telescopic channels, lift-up systems and more.",
   },
@@ -169,7 +169,7 @@ async function prerender() {
 }
 
 function generateSitemap() {
-  const baseUrl = "https://kitilocks.com";
+  const baseUrl = "https://KitiStore.com";
   const lastmod = new Date().toISOString().split("T")[0];
 
   let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -193,7 +193,7 @@ function generateRobots() {
   return `User-agent: *
 Allow: /
 
-Sitemap: https://kitilocks.com/sitemap.xml
+Sitemap: https://KitiStore.com/sitemap.xml
 
 # Disallow admin and API routes
 Disallow: /admin

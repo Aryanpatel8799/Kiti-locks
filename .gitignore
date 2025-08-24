@@ -1,2 +1,23 @@
 node_modules
 .env
+
+# PM2 logs and runtime files
+logs/
+.pm2/
+ecosystem.config.js
+
+# Build outputs
+dist/
+
+# Environment files
+.env.local
+.env.production
+.env.development
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

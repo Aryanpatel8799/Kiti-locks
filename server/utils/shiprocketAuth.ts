@@ -265,7 +265,7 @@ export const createShiprocketOrder = async (orderData: {
       channel_id: "", // Can be left empty for marketplace integration
       comment: orderData.comment || "Order created via website",
       reseller_name: orderData.reseller_name || "KHUNTIA ENTERPRISES PRIVATE LIMITED",
-      company_name: orderData.company_name || "Kiti locks",
+      company_name: orderData.company_name || "Kiti Store",
       billing_customer_name: orderData.customer_name,
       billing_last_name: "",
       billing_address: orderData.shipping_address.address,
@@ -366,7 +366,7 @@ export const createShiprocketOrderWithDefaults = async (orderData: {
     ...orderData,
     pickup_location: "Primary",
     reseller_name: "KHUNTIA ENTERPRISES PRIVATE LIMITED",
-    company_name: "Kiti locks",
+    company_name: "Kiti Store",
     billing_isd_code: "91",
     order_type: "ESSENTIALS",
     comment: orderData.comment || "Order created via website"

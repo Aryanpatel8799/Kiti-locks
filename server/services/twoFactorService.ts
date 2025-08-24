@@ -10,8 +10,8 @@ export class TwoFactorService {
     backupCodes: string[];
   } {
     const secret = speakeasy.generateSecret({
-      name: `Kiti Locks (${userEmail})`,
-      issuer: "Kiti Locks Admin",
+      name: `Kiti Store (${userEmail})`,
+      issuer: "Kiti Store Admin",
       length: 32,
     });
 

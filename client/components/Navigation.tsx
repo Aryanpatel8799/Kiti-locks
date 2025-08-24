@@ -120,7 +120,7 @@ export default function Navigation() {
             <div className="w-6 h-6 xs:w-8 xs:h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs xs:text-sm">K</span>
             </div>
-            <span className="text-base xs:text-lg sm:text-xl font-bold text-slate-900">Kiti Locks</span>
+            <span className="text-base xs:text-lg sm:text-xl font-bold text-slate-900">Kiti Store</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -364,7 +364,7 @@ export default function Navigation() {
                     <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                       <span className="text-white font-bold text-sm">K</span>
                     </div>
-                    <span className="text-lg xs:text-xl font-bold text-slate-900">Kiti Locks</span>
+                    <span className="text-lg xs:text-xl font-bold text-slate-900">Kiti Store</span>
                   </div>
                 </div>
 

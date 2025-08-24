@@ -1,0 +1,36 @@
+{
+  "apps": [
+    {
+      "name": "kiti-locks-dev",
+      "script": "dist/server/node-build.mjs",
+      "cwd": "/Users/aryanpatel/Desktop/Kiti-locks",
+      "instances": 1,
+      "exec_mode": "fork",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": 8080
+      },
+      "log_file": "./logs/dev.log",
+      "out_file": "./logs/dev-out.log",
+      "error_file": "./logs/dev-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "merge_logs": true,
+      "max_memory_restart": "500M",
+      "restart_delay": 1000,
+      "max_restarts": 5,
+      "min_uptime": "5s",
+      "kill_timeout": 3000,
+      "watch": ["dist/server"],
+      "watch_delay": 1000,
+      "ignore_watch": [
+        "node_modules",
+        "logs",
+        ".git",
+        "dist/spa",
+        "client",
+        "server"
+      ],
+      "source_map_support": true
+    }
+  ]
+}

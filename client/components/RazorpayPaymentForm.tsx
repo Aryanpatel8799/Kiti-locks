@@ -106,7 +106,7 @@ export default function RazorpayPaymentForm({
         key: orderData.razorpayKeyId || razorpayKeyId,
         amount: orderData.amount,
         currency: orderData.currency || "INR",
-        name: "Kiti Locks",
+        name: "Kiti Store",
         description: "Premium Kitchen Hardware",
         image: "/logo.png",
         order_id: orderData.orderId,
@@ -210,7 +210,7 @@ export default function RazorpayPaymentForm({
           contact: billingDetails.contact,
         },
         notes: {
-          address: "Kiti Locks Corporate Office",
+          address: "Kiti Store Corporate Office",
         },
         theme: {
           color: "#2563eb",

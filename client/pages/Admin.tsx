@@ -761,7 +761,7 @@ export default function Admin() {
                     </div>
                     <div>
                       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-                      <p className="text-blue-100 text-lg">Kiti Locks Management Center</p>
+                      <p className="text-blue-100 text-lg">Kiti Store Management Center</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6 text-sm text-blue-100">

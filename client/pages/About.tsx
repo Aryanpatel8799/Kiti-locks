@@ -56,7 +56,7 @@ export default function About() {
       name: "Pradeep Kumar Khuntia",
       role: "Founder & Director",
       image: "/placeholder.svg",
-      bio: "Visionary founder of Kiti Locks and Director of Khuntia Enterprises Pvt. Ltd. Leading the transformation of modular kitchen hardware for modern Indian homes.",
+      bio: "Visionary founder of Kiti Store and Director of Khuntia Enterprises Pvt. Ltd. Leading the transformation of modular kitchen hardware for modern Indian homes.",
     },
     {
       name: "Rajesh Kumar",
@@ -166,15 +166,15 @@ export default function About() {
               </h2>
               <div className="space-y-4 text-lg text-slate-600 leading-relaxed">
                 <p>
-                  Kiti Locks was founded in 2022 by Pradeep Kumar Khuntia, a
+                  Kiti Store was founded in 2022 by Pradeep Kumar Khuntia, a
                   visionary leader who recognized the gap in premium kitchen
                   hardware for modern Indian homes. Frustrated by the lack of
                   quality, globally-inspired hardware that could meet Indian
-                  kitchen needs, he established Kiti Locks through Khuntia
+                  kitchen needs, he established Kiti Store through Khuntia
                   Enterprises Pvt. Ltd.
                 </p>
                 <p>
-                  Under Mr. Khuntia's leadership, Kiti Locks has become
+                  Under Mr. Khuntia's leadership, Kiti Store has become
                   synonymous with precision engineering, aesthetic design, and
                   functional excellence. The brand specializes in bringing
                   world-class kitchen hardware like hydraulic hinges, soft-close
@@ -184,7 +184,7 @@ export default function About() {
                   Today, we're proud to serve customers across India with our
                   space-optimized hardware engineered specifically for compact
                   Indian kitchens. Every product reflects our founder's mission:
-                  to make Kiti Locks the go-to name for luxurious, durable, and
+                  to make Kiti Store the go-to name for luxurious, durable, and
                   space-efficient kitchen solutions across India.
                 </p>
               </div>
@@ -201,7 +201,7 @@ export default function About() {
                   <Quote className="w-16 h-16 text-blue-600 mx-auto mb-4" />
                   <blockquote className="text-xl font-medium text-slate-900 mb-4">
                     "Every kitchen deserves hardware that combines global design
-                    standards with Indian functionality. That's the Kiti Locks
+                    standards with Indian functionality. That's the Kiti Store
                     promise."
                   </blockquote>
                   <cite className="text-slate-600">
@@ -278,7 +278,7 @@ export default function About() {
               Meet Our Team
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              The passionate people behind Kiti Locks, dedicated to delivering
+              The passionate people behind Kiti Store, dedicated to delivering
               world-class kitchen hardware for modern Indian homes
             </p>
           </motion.div>

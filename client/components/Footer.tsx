@@ -21,7 +21,7 @@ export default function Footer() {
               <div className="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xs xs:text-sm">K</span>
               </div>
-              <span className="text-lg xs:text-xl font-bold">Kiti Locks</span>
+              <span className="text-lg xs:text-xl font-bold">Kiti Store</span>
             </Link>
             <p className="text-slate-400 mb-4 xs:mb-6 max-w-md text-sm xs:text-base">
               Your trusted partner for premium kitchen hardware.
@@ -59,7 +59,7 @@ export default function Footer() {
               <div className="flex items-start xs:items-center space-x-3">
                 <Mail className="w-4 h-4 xs:w-5 xs:h-5 text-slate-400 mt-1 xs:mt-0 flex-shrink-0" />
                 <span className="text-slate-400 text-sm xs:text-base break-all">
-                  customercare@kitilocks.com
+                  customercare@KitiStore.com
                 </span>
               </div>
               <div className="flex items-center space-x-3">

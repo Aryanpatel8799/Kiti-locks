@@ -124,7 +124,7 @@ export default function Privacy() {
                       Our Commitment to Privacy
                     </h2>
                     <p className="text-slate-600 leading-relaxed mb-4">
-                      At Kiti Locks, we understand that your privacy is
+                      At Kiti Store, we understand that your privacy is
                       important. This Privacy Policy describes how we collect,
                       use, and protect your personal information when you visit
                       our website or use our services.
@@ -207,10 +207,10 @@ export default function Privacy() {
                 <p className="text-slate-600 text-sm">
                   To exercise any of these rights, please contact us at{" "}
                   <a
-                    href="mailto:privacy@Kiti Locks.com"
+                    href="mailto:privacy@Kiti Store.com"
                     className="text-blue-600 hover:text-blue-700 font-medium"
                   >
-                    privacy@Kiti Locks.com
+                    privacy@Kiti Store.com
                   </a>
                 </p>
               </CardContent>
@@ -253,10 +253,10 @@ export default function Privacy() {
                         Terms of Service
                       </Link>
                       <a
-                        href="mailto:privacy@Kiti Locks.com"
+                        href="mailto:privacy@Kiti Store.com"
                         className="text-blue-600 hover:text-blue-700 font-medium"
                       >
-                        privacy@Kiti Locks.com
+                        privacy@Kiti Store.com
                       </a>
                     </div>
                   </div>

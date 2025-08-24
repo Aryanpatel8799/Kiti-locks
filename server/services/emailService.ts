@@ -123,7 +123,7 @@ class NodemailerEmailService implements EmailService {
         <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px;">
           <!-- Header -->
           <div style="text-align: center; border-bottom: 2px solid #e9ecef; padding-bottom: 20px; margin-bottom: 30px;">
-            <h1 style="color: #495057; margin: 0; font-size: 28px;">Kiti Locks</h1>
+            <h1 style="color: #495057; margin: 0; font-size: 28px;">Kiti Store</h1>
             <p style="color: #6c757d; margin: 5px 0 0 0;">Premium Bathroom Hardware & Accessories</p>
           </div>
 
@@ -200,8 +200,8 @@ class NodemailerEmailService implements EmailService {
               <a href="mailto:support@bathroomhardware.com" style="color: #007bff;">support@bathroomhardware.com</a>
             </p>
             <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 12px;">
-              Kiti Locks | Premium Bathroom Hardware & Accessories<br>
-              © 2024 Kiti Locks. All rights reserved.
+              Kiti Store | Premium Bathroom Hardware & Accessories<br>
+              © 2024 Kiti Store. All rights reserved.
             </p>
           </div>
         </div>
@@ -220,7 +220,7 @@ class NodemailerEmailService implements EmailService {
       );
 
       await this.transporter.sendMail({
-        from: `"Kiti Locks" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
+        from: `"Kiti Store" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
         to: orderData.customerEmail,
         subject,
         html,
@@ -247,7 +247,7 @@ class NodemailerEmailService implements EmailService {
       );
 
       await this.transporter.sendMail({
-        from: `"Kiti Locks" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
+        from: `"Kiti Store" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
         to: orderData.customerEmail,
         subject,
         html,
@@ -269,7 +269,7 @@ class NodemailerEmailService implements EmailService {
       );
 
       await this.transporter.sendMail({
-        from: `"Kiti Locks" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
+        from: `"Kiti Store" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
         to: orderData.customerEmail,
         subject,
         html,

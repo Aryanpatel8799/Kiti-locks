@@ -33,9 +33,9 @@ export default function Contact() {
     {
       icon: Mail,
       title: "Email Us",
-      value: "customercare@kitilocks.com",
+      value: "customercare@KitiStore.com",
       description: "Send us an email anytime",
-      action: "mailto:customercare@kitilocks.com",
+      action: "mailto:customercare@KitiStore.com",
     },
     {
       icon: Phone,
