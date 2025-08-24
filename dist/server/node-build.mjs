@@ -312,8 +312,8 @@ class TwoFactorService {
   // Generate a new secret for 2FA
   static generateSecret(userEmail) {
     const secret = speakeasy.generateSecret({
-      name: `Kiti Locks (${userEmail})`,
-      issuer: "Kiti Locks Admin",
+      name: `Kiti Store (${userEmail})`,
+      issuer: "Kiti Store Admin",
       length: 32
     });
     const backupCodes = this.generateBackupCodes();
@@ -1060,7 +1060,7 @@ const productSchema$1 = new Schema(
       title: { type: String, trim: true },
       description: { type: String, trim: true }
     },
-    // New Kiti Locks specific fields
+    // New Kiti Store specific fields
     operationType: {
       type: String,
       enum: ["Soft Close", "Non-Soft Close"]
@@ -1153,7 +1153,7 @@ const productSchema = z.object({
     title: z.string().optional(),
     description: z.string().optional()
   }).default({}),
-  // New Kiti Locks specific fields
+  // New Kiti Store specific fields
   operationType: z.enum(["Soft Close", "Non-Soft Close"]).optional(),
   productCode: z.string().optional(),
   usageArea: z.enum(["Kitchen", "Wardrobe", "Drawer", "Overhead"]).optional(),
@@ -2401,9 +2401,9 @@ class NodemailerEmailService {
     });
   }
   formatPrice(price) {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD"
+      currency: "INR"
     }).format(price);
   }
   generateOrderEmailTemplate(orderData, type, trackingNumber) {
@@ -2466,7 +2466,7 @@ class NodemailerEmailService {
         <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px;">
           <!-- Header -->
           <div style="text-align: center; border-bottom: 2px solid #e9ecef; padding-bottom: 20px; margin-bottom: 30px;">
-            <h1 style="color: #495057; margin: 0; font-size: 28px;">Kiti Locks</h1>
+            <h1 style="color: #495057; margin: 0; font-size: 28px;">Kiti Store</h1>
             <p style="color: #6c757d; margin: 5px 0 0 0;">Premium Bathroom Hardware & Accessories</p>
           </div>
 
@@ -2537,8 +2537,8 @@ class NodemailerEmailService {
               <a href="mailto:support@bathroomhardware.com" style="color: #007bff;">support@bathroomhardware.com</a>
             </p>
             <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 12px;">
-              Kiti Locks | Premium Bathroom Hardware & Accessories<br>
-              © 2024 Kiti Locks. All rights reserved.
+              Kiti Store | Premium Bathroom Hardware & Accessories<br>
+              © 2024 Kiti Store. All rights reserved.
             </p>
           </div>
         </div>
@@ -2554,7 +2554,7 @@ class NodemailerEmailService {
         "confirmation"
       );
       await this.transporter.sendMail({
-        from: `"Kiti Locks" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
+        from: `"Kiti Store" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
         to: orderData.customerEmail,
         subject,
         html
@@ -2574,7 +2574,7 @@ class NodemailerEmailService {
         trackingNumber
       );
       await this.transporter.sendMail({
-        from: `"Kiti Locks" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
+        from: `"Kiti Store" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
         to: orderData.customerEmail,
         subject,
         html
@@ -2593,7 +2593,7 @@ class NodemailerEmailService {
         "delivered"
       );
       await this.transporter.sendMail({
-        from: `"Kiti Locks" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
+        from: `"Kiti Store" <${process.env.NODE_MAILER_EMAIL || "noreply@bathroomhardware.com"}>`,
         to: orderData.customerEmail,
         subject,
         html
@@ -2629,6 +2629,54 @@ class MockEmailService {
 }
 const emailService = process.env.NODE_ENV === "production" && process.env.NODE_MAILER_EMAIL && process.env.NODE_MAILER_PASS ? new NodemailerEmailService() : new MockEmailService();
 const router$9 = Router();
+router$9.get(
+  "/analytics",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      if (!getConnectionStatus()) {
+        res.status(503).json({ error: "Database connection required" });
+        return;
+      }
+      const totalOrders = await OrderModel.countDocuments();
+      const totalRevenue = await OrderModel.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        { $group: { _id: null, total: { $sum: "$total" } } }
+      ]);
+      const ordersByStatus = await OrderModel.aggregate([
+        { $group: { _id: "$status", count: { $sum: 1 } } }
+      ]);
+      const recentOrders = await OrderModel.find().populate("user", "name email").sort({ createdAt: -1 }).limit(10).select("orderNumber total status createdAt user");
+      const sixMonthsAgo = /* @__PURE__ */ new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      const ordersByMonth = await OrderModel.aggregate([
+        { $match: { createdAt: { $gte: sixMonthsAgo } } },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            count: { $sum: 1 },
+            revenue: { $sum: "$total" }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ]);
+      res.json({
+        totalOrders,
+        totalRevenue: totalRevenue[0]?.total || 0,
+        ordersByStatus,
+        recentOrders,
+        ordersByMonth
+      });
+    } catch (error) {
+      console.error("Get order analytics error:", error);
+      res.status(500).json({ error: "Failed to fetch order analytics" });
+    }
+  }
+);
 router$9.post(
   "/create",
   authenticateToken,
@@ -2997,54 +3045,6 @@ router$9.get(
     }
   }
 );
-router$9.get(
-  "/analytics",
-  authenticateToken,
-  requireAdmin,
-  async (req, res) => {
-    try {
-      if (!getConnectionStatus()) {
-        res.status(503).json({ error: "Database connection required" });
-        return;
-      }
-      const totalOrders = await OrderModel.countDocuments();
-      const totalRevenue = await OrderModel.aggregate([
-        { $match: { paymentStatus: "paid" } },
-        { $group: { _id: null, total: { $sum: "$total" } } }
-      ]);
-      const ordersByStatus = await OrderModel.aggregate([
-        { $group: { _id: "$status", count: { $sum: 1 } } }
-      ]);
-      const recentOrders = await OrderModel.find().populate("user", "name email").sort({ createdAt: -1 }).limit(10).select("orderNumber total status createdAt user");
-      const sixMonthsAgo = /* @__PURE__ */ new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-      const ordersByMonth = await OrderModel.aggregate([
-        { $match: { createdAt: { $gte: sixMonthsAgo } } },
-        {
-          $group: {
-            _id: {
-              year: { $year: "$createdAt" },
-              month: { $month: "$createdAt" }
-            },
-            count: { $sum: 1 },
-            revenue: { $sum: "$total" }
-          }
-        },
-        { $sort: { "_id.year": 1, "_id.month": 1 } }
-      ]);
-      res.json({
-        totalOrders,
-        totalRevenue: totalRevenue[0]?.total || 0,
-        ordersByStatus,
-        recentOrders,
-        ordersByMonth
-      });
-    } catch (error) {
-      console.error("Get order analytics error:", error);
-      res.status(500).json({ error: "Failed to fetch order analytics" });
-    }
-  }
-);
 let cachedToken = null;
 let tokenExpiry = null;
 let lastLoginAttempt = null;
@@ -3217,7 +3217,7 @@ const createShiprocketOrder = async (orderData) => {
       // Can be left empty for marketplace integration
       comment: orderData.comment || "Order created via website",
       reseller_name: orderData.reseller_name || "KHUNTIA ENTERPRISES PRIVATE LIMITED",
-      company_name: orderData.company_name || "Kiti locks",
+      company_name: orderData.company_name || "Kiti Store",
       billing_customer_name: orderData.customer_name,
       billing_last_name: "",
       billing_address: orderData.shipping_address.address,
@@ -3286,7 +3286,7 @@ const createShiprocketOrderWithDefaults = async (orderData) => {
     ...orderData,
     pickup_location: "Primary",
     reseller_name: "KHUNTIA ENTERPRISES PRIVATE LIMITED",
-    company_name: "Kiti locks",
+    company_name: "Kiti Store",
     billing_isd_code: "91",
     order_type: "ESSENTIALS",
     comment: orderData.comment || "Order created via website"

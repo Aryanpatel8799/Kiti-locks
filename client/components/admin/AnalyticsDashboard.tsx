@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -48,7 +47,9 @@ interface AnalyticsData {
   }>;
 }
 
-interface AnalyticsDashboardProps {}
+interface AnalyticsDashboardProps {
+  apiCall: (url: string, options?: RequestInit) => Promise<Response>;
+}
 
 export default function AnalyticsDashboard({}: AnalyticsDashboardProps) {
   const { user, isAuthenticated } = useAuth();

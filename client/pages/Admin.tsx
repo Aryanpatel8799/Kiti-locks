@@ -54,7 +54,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { DashboardStats, InventoryAlerts, QuickActions } from "@/components/admin/DashboardComponents";
+import { InventoryAlerts, QuickActions } from "@/components/admin/DashboardComponents";
 import UserManagement from "@/components/admin/UserManagement";
 import InventoryManagement from "@/components/admin/InventoryManagement";
 import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard";
@@ -636,9 +636,9 @@ export default function Admin() {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
     }).format(price);
   };
 
@@ -696,7 +696,7 @@ export default function Admin() {
 
   if (user?.role !== "admin") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -728,7 +728,7 @@ export default function Admin() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -742,7 +742,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Enhanced Header */}
         <motion.div 
@@ -751,22 +751,22 @@ export default function Admin() {
           transition={{ duration: 0.6 }}
           className="mb-8"
         >
-          <Card className="bg-gradient-to-r from-blue-600 to-blue-700 border-0 shadow-xl">
+          <Card className="bg-white border shadow-sm">
             <CardContent className="p-8">
               <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
-                <div className="text-white mb-4 lg:mb-0">
+                <div className="text-gray-900 mb-4 lg:mb-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
-                      <BarChart3 className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <BarChart3 className="w-5 h-5 text-gray-600" />
                     </div>
                     <div>
-                      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-                      <p className="text-blue-100 text-lg">Kiti Store Management Center</p>
+                      <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
+                      <p className="text-gray-600 text-base">Kiti Store Management Center</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6 text-sm text-blue-100">
+                  <div className="flex items-center gap-6 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       <span>System Online</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -781,18 +781,18 @@ export default function Admin() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Button 
-                    variant="secondary" 
+                    variant="outline" 
                     size="sm"
                     onClick={() => fetchData()}
-                    className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+                    className="border-gray-300 hover:bg-gray-50 text-gray-700"
                   >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Refresh
                   </Button>
                   <Button 
-                    variant="secondary" 
+                    variant="outline" 
                     size="sm"
-                    className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+                    className="border-gray-300 hover:bg-gray-50 text-gray-700"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export
@@ -810,73 +810,73 @@ export default function Admin() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
         >
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 hover:shadow-xl transition-all duration-300">
+          <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-blue-600 mb-1">Total Products</p>
-                  <p className="text-3xl font-bold text-blue-900">{stats.totalProducts}</p>
+                  <p className="text-2xl font-semibold text-gray-900">{stats.totalProducts}</p>
                   <div className="flex items-center mt-2">
                     <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
                     <span className="text-sm text-green-600 font-medium">+12% this month</span>
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <Package className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <Package className="w-5 h-5 text-gray-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100 hover:shadow-xl transition-all duration-300">
+          <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-green-600 mb-1">Total Orders</p>
-                  <p className="text-3xl font-bold text-green-900">{stats.totalOrders}</p>
+                  <p className="text-2xl font-semibold text-gray-900">{stats.totalOrders}</p>
                   <div className="flex items-center mt-2">
                     <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
                     <span className="text-sm text-green-600 font-medium">+8% this week</span>
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                  <ShoppingCart className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-gray-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100 hover:shadow-xl transition-all duration-300">
+          <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-purple-600 mb-1">Total Users</p>
-                  <p className="text-3xl font-bold text-purple-900">{stats.totalUsers}</p>
+                  <p className="text-2xl font-semibold text-gray-900">{stats.totalUsers}</p>
                   <div className="flex items-center mt-2">
                     <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
                     <span className="text-sm text-green-600 font-medium">+15% this month</span>
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-5 h-5 text-gray-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-yellow-50 to-yellow-100 hover:shadow-xl transition-all duration-300">
+          <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-yellow-600 mb-1">Revenue</p>
-                  <p className="text-3xl font-bold text-yellow-900">{formatPrice(stats.totalRevenue)}</p>
+                  <p className="text-2xl font-semibold text-gray-900">{formatPrice(stats.totalRevenue)}</p>
                   <div className="flex items-center mt-2">
                     <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
                     <span className="text-sm text-green-600 font-medium">+22% this month</span>
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-gray-600" />
                 </div>
               </div>
             </CardContent>
@@ -892,48 +892,48 @@ export default function Admin() {
           <Tabs defaultValue="dashboard" className="space-y-6">
             <Card className="border-0 shadow-lg">
               <CardContent className="p-6">
-                <TabsList className="grid w-full grid-cols-6 bg-gray-100 p-1 rounded-lg">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 bg-gray-100 p-1 rounded-lg gap-1">
                   <TabsTrigger 
                     value="dashboard" 
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
                   >
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    Dashboard
+                    <BarChart3 className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Dashboard</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="products"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
                   >
-                    <Package className="w-4 h-4 mr-2" />
-                    Products
+                    <Package className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Products</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="categories"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
                   >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Categories
+                    <Settings className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Categories</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="inventory"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
                   >
-                    <Package className="w-4 h-4 mr-2" />
-                    Inventory
+                    <Package className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Inventory</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="users"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
                   >
-                    <Users className="w-4 h-4 mr-2" />
-                    Users
+                    <Users className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Users</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="orders"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
                   >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Orders
+                    <ShoppingCart className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Orders</span>
                   </TabsTrigger>
                 </TabsList>
               </CardContent>
@@ -1016,7 +1016,7 @@ export default function Admin() {
           {/* Products Tab */}
           <TabsContent value="products">
             <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b">
+              <CardHeader className="bg-gray-50 border-b">
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                   <div>
                     <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -1042,7 +1042,7 @@ export default function Admin() {
                       onOpenChange={setIsProductDialogOpen}
                     >
                       <DialogTrigger asChild>
-                        <Button onClick={resetProductForm} className="bg-blue-600 hover:bg-blue-700">
+                        <Button onClick={resetProductForm} className="bg-gray-900 hover:bg-gray-800">
                           <Plus className="w-4 h-4 mr-2" />
                           Add Product
                         </Button>
@@ -1299,7 +1299,7 @@ export default function Admin() {
                             <Button 
                               type="submit" 
                               disabled={uploadingImages}
-                              className="bg-blue-600 hover:bg-blue-700"
+                              className="bg-gray-900 hover:bg-gray-800"
                             >
                               {editingProduct ? "Update Product" : "Create Product"}
                             </Button>
@@ -1418,6 +1418,7 @@ export default function Admin() {
                                 variant="outline"
                                 className="hover:bg-blue-50 hover:border-blue-300"
                                 onClick={() => editProduct(product)}
+                                aria-label={`Edit product ${product.name}`}
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -1426,6 +1427,7 @@ export default function Admin() {
                                 variant="outline"
                                 className="hover:bg-red-50 hover:border-red-300 text-red-600"
                                 onClick={() => handleDeleteProduct(product._id)}
+                                aria-label={`Delete product ${product.name}`}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>

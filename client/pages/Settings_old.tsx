@@ -4,8 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -35,8 +43,18 @@ interface UserSettings {
     location?: string;
     avatar?: string;
     isVerified: boolean;
+    twoFactorEnabled: boolean;
+  };
+  preferences: {
+    newsletter: boolean;
+    notifications: boolean;
+    marketing: boolean;
+    language: string;
+    currency: string;
   };
   security: {
+    twoFactorEnabled: boolean;
+    lastLoginAt?: string;
     passwordChangedAt?: string;
   };
 }
@@ -106,11 +124,13 @@ export default function Settings() {
   };
 
   const updateProfile = async () => {
+    // Validate required fields
     if (!profileForm.name.trim()) {
       toast.error("Name is required");
       return;
     }
 
+    // Validate phone number format if provided
     if (profileForm.phone && profileForm.phone.trim()) {
       const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
       if (!phoneRegex.test(profileForm.phone.replace(/\s/g, ''))) {
@@ -137,7 +157,7 @@ export default function Settings() {
       if (response.ok) {
         const data = await response.json();
         setSettings(prev => prev ? { ...prev, profile: { ...prev.profile, ...data.profile } } : null);
-        toast.success("Profile updated successfully!");
+        toast.success("Profile updated successfully! ✨");
       } else {
         const error = await response.json();
         toast.error(error.error || "Failed to update profile");
@@ -154,12 +174,14 @@ export default function Settings() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       toast.error("Please upload a valid image file (JPG, PNG, or WebP)");
       return;
     }
 
+    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image size should be less than 5MB");
       return;
@@ -185,7 +207,7 @@ export default function Settings() {
           ...prev, 
           profile: { ...prev.profile, avatar: data.avatar } 
         } : null);
-        toast.success("Profile image updated successfully!");
+        toast.success("Profile image updated successfully! ✨");
       } else {
         const error = await response.json();
         toast.error(error.error || "Failed to upload image");
@@ -227,6 +249,8 @@ export default function Settings() {
     }
   };
 
+  // Removed updatePreferences function as preferences section is no longer needed
+
   const changePassword = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast.error("Passwords don't match");
@@ -253,19 +277,33 @@ export default function Settings() {
         toast.error(error.error || "Failed to change password");
       }
     } catch (error) {
-      console.error("Password change error:", error);
-      toast.error("Network error. Please try again.");
+      toast.error("Failed to change password");
     } finally {
       setSaving(false);
     }
   };
 
-  const requestAccountDeletion = async () => {
-    if (!deleteForm.password) {
-      toast.error("Password is required to delete account");
-      return;
-    }
+  const requestDataExport = async () => {
+    try {
+      const response = await fetch("/api/settings/export", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(data.message);
+      } else {
+        toast.error("Failed to request data export");
+      }
+    } catch (error) {
+      toast.error("Failed to request data export");
+    }
+  };
+
+  const requestAccountDeletion = async () => {
     try {
       setSaving(true);
       const response = await fetch("/api/settings/delete-account", {
@@ -295,21 +333,31 @@ export default function Settings() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Access Denied</h1>
-          <p className="text-gray-600">Please sign in to access your settings.</p>
-        </div>
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Authentication Required
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Please log in to access your settings.
+            </p>
+            <Button onClick={() => window.location.href = "/login"}>
+              Log In
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading settings...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading settings...</p>
         </div>
       </div>
     );
@@ -335,6 +383,14 @@ export default function Settings() {
                 Profile
               </TabsTrigger>
               <TabsTrigger 
+                value="security" 
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
+                <Shield className="h-4 w-4" />
+                Security
+              </TabsTrigger>
+            </TabsList>
+          </div> 
                 value="security" 
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
               >

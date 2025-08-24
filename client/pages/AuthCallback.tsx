@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function AuthCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { } = useAuth();
 
   useEffect(() => {
     const token = searchParams.get("token");

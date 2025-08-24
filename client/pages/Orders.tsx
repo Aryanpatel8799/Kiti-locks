@@ -221,9 +221,9 @@ export default function Orders() {
               <Card key={order._id} className="bg-white shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
                 <CardContent className="p-6">
                   {/* Order Header */}
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                  <div className="flex flex-col gap-4 mb-6">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">
                           Order #{order._id.slice(-8).toUpperCase()}
                         </h3>
@@ -234,7 +234,7 @@ export default function Orders() {
                           </Badge>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
                           {new Date(order.createdAt).toLocaleDateString('en-IN', {
@@ -254,9 +254,9 @@ export default function Orders() {
                       </div>
                     </div>
                     
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                      <div className="flex-1 sm:text-right">
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900">
                           {formatPrice(order.total)}
                         </p>
                         <p className="text-sm text-gray-600">
@@ -264,12 +264,12 @@ export default function Orders() {
                         </p>
                       </div>
                       
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setExpandedOrder(expandedOrder === order._id ? null : order._id)}
-                          className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                          className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           {expandedOrder === order._id ? 'Hide' : 'Details'}
@@ -280,7 +280,7 @@ export default function Orders() {
                           size="sm"
                           onClick={() => fetchOrderTracking(order._id)}
                           disabled={trackingOrder === order._id}
-                          className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                          className="border-blue-300 text-blue-700 hover:bg-blue-50 w-full sm:w-auto"
                         >
                           <Truck className="w-4 h-4 mr-1" />
                           {trackingOrder === order._id ? 'Loading...' : 'Track'}

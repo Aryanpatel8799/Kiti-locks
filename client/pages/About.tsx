@@ -13,7 +13,6 @@ import {
   Star,
   Quote,
   ArrowRight,
-  CheckCircle,
 } from "lucide-react";
 
 export default function About() {
@@ -125,7 +124,7 @@ export default function About() {
       {/* Stats Section */}
       <section className="py-16 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -232,7 +231,7 @@ export default function About() {
               customer service
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {values.map((value, index) => (
               <motion.div
                 key={value.title}

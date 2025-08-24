@@ -1,23 +1,12 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from "sonner";
 import {
   Mail,
   Phone,
   MapPin,
-  Clock,
-  Send,
   MessageCircle,
   HeadphonesIcon,
-  Globe,
-  CheckCircle,
 } from "lucide-react";
 
 export default function Contact() {
@@ -159,7 +148,7 @@ export default function Contact() {
       {/* Contact Methods */}
       <section className="py-16 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactInfo.map((info, index) => (
               <motion.div
                 key={info.title}

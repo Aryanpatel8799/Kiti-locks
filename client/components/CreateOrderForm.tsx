@@ -625,7 +625,7 @@ const CreateOrderForm: React.FC = () => {
         </Alert>
       )}
       {success && (
-        <Alert variant="success" className="mb-4">
+        <Alert className="mb-4 border-green-200 bg-green-50 text-green-800">
           <CheckCircle className="h-4 w-4" />
           <AlertTitle>Success</AlertTitle>
           <AlertDescription>

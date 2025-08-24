@@ -415,7 +415,7 @@ export default function Index() {
                 icon: Truck,
                 title: "Fast Shipping",
                 description:
-                  "Free shipping on orders over $100 with 2-3 day delivery",
+                  "Free shipping on orders over ₹3000 with 2-3 day delivery",
                 delay: 0.2,
               },
               {

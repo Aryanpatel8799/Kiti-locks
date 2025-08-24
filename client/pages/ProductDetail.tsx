@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import {
   Select,
@@ -91,7 +90,7 @@ export default function ProductDetail() {
               (v: any) => v.name === type,
             );
             if (firstVariant) {
-              initialVariants[type] = firstVariant.value;
+              initialVariants[type as string] = firstVariant.value;
             }
           });
           setSelectedVariants(initialVariants);
@@ -119,6 +118,36 @@ export default function ProductDetail() {
   const calculateDiscount = (price: number, comparePrice?: number) => {
     if (!comparePrice || comparePrice <= price) return 0;
     return Math.round(((comparePrice - price) / comparePrice) * 100);
+  };
+
+  const handleShare = async () => {
+    if (!product) return;
+
+    const shareData = {
+      title: product.name,
+      text: `Check out this amazing product: ${product.name}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        toast.success("Product shared successfully!");
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Product link copied to clipboard!");
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Product link copied to clipboard!");
+      } catch (clipboardError) {
+        toast.error("Failed to share product");
+      }
+    }
   };
 
   const handleAddToCart = async () => {
@@ -221,9 +250,9 @@ export default function ProductDetail() {
           <span className="text-slate-900">{product.name}</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
           {/* Product Images */}
-          <div className="space-y-4">
+          <div className="space-y-3 lg:space-y-4">
             {/* Main Image */}
             <div className="aspect-square rounded-lg overflow-hidden bg-slate-100">
               {product.images.length > 0 ? (
@@ -241,12 +270,12 @@ export default function ProductDetail() {
 
             {/* Thumbnail Images */}
             {product.images.length > 1 && (
-              <div className="flex space-x-2 overflow-x-auto">
+              <div className="flex space-x-2 overflow-x-auto pb-2">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-colors ${
                       selectedImage === index
                         ? "border-blue-500"
                         : "border-slate-200 hover:border-slate-300"
@@ -269,7 +298,7 @@ export default function ProductDetail() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <Badge variant="outline">{product.category.name}</Badge>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" onClick={handleShare}>
                   <Share2 className="w-4 h-4" />
                 </Button>
               </div>
@@ -365,25 +394,27 @@ export default function ProductDetail() {
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Quantity
               </label>
-              <div className="flex items-center space-x-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleQuantityChange(quantity - 1)}
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="w-4 h-4" />
-                </Button>
-                <span className="w-12 text-center font-medium">{quantity}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleQuantityChange(quantity + 1)}
-                  disabled={quantity >= product.stock}
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-                <span className="text-sm text-slate-600 ml-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center space-x-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuantityChange(quantity - 1)}
+                    disabled={quantity <= 1}
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <span className="w-12 text-center font-medium">{quantity}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuantityChange(quantity + 1)}
+                    disabled={quantity >= product.stock}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                <span className="text-sm text-slate-600">
                   {product.stock} available
                 </span>
               </div>
@@ -392,14 +423,14 @@ export default function ProductDetail() {
             {/* Add to Cart */}
             <div className="space-y-3">
               <Button
-                className="w-full h-12 text-lg"
+                className="w-full h-12 text-base sm:text-lg"
                 onClick={handleAddToCart}
                 disabled={product.stock === 0}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
               </Button>
-              <Button variant="outline" className="w-full h-12">
+              <Button variant="outline" className="w-full h-12 text-base sm:text-lg">
                 <Heart className="w-5 h-5 mr-2" />
                 Add to Wishlist
               </Button>
@@ -409,7 +440,7 @@ export default function ProductDetail() {
             <div className="space-y-3 pt-6 border-t">
               <div className="flex items-center space-x-3 text-sm text-slate-600">
                 <Truck className="w-5 h-5 text-green-600" />
-                <span>Free shipping on orders over $100</span>
+                <span>Free shipping on orders over ₹3000</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-slate-600">
                 <Shield className="w-5 h-5 text-blue-600" />

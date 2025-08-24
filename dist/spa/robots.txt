@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://kitilocks.com/sitemap.xml
+Sitemap: https://KitiStore.com/sitemap.xml
 
 # Disallow admin and API routes
 Disallow: /admin

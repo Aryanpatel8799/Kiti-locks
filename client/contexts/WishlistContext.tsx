@@ -53,7 +53,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const lastToggleRef = useRef<{ [productId: string]: number }>({});
 
   useEffect(() => {
