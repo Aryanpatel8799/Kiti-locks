@@ -1,8 +1,25 @@
+User-agent: *
+Allow: /
+
+# Specific bot configurations
 User-agent: Googlebot
 Allow: /
+Allow: /assets/
+Allow: *.css
+Allow: *.js
+Allow: *.png
+Allow: *.jpg
+Allow: *.jpeg
+Allow: *.webp
+Allow: *.svg
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Allow: /assets/
+Allow: *.css
+Allow: *.js
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -10,5 +27,23 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Disallow specific paths
+Disallow: /admin/
+Disallow: /api/auth/
+Disallow: /api/users/
+Disallow: /api/orders/
+Disallow: /checkout/
+Disallow: /account/
+Disallow: /settings/
+Disallow: /auth/
+Disallow: /*.json$
+Disallow: /*?*utm_*
+Disallow: /*?*sid=*
+
+# Allow important public API endpoints for SEO
+Allow: /api/products
+Allow: /api/categories
+Allow: /api/search
+
+# Sitemap location
+Sitemap: https://www.kitistore.com/sitemap.xml

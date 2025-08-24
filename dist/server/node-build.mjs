@@ -471,7 +471,6 @@ router$f.post("/register", async (req, res) => {
 });
 router$f.post("/login", async (req, res) => {
   try {
-    console.log("Login attempt for email:", req.body.email);
     const { email, password, twoFactorToken } = req.body;
     if (!email || !password) {
       res.status(400).json({ error: "Email and password are required" });
@@ -658,7 +657,6 @@ router$f.get(
 );
 router$f.post("/google", async (req, res) => {
   try {
-    console.log("Google OAuth login attempt");
     const { credential } = req.body;
     if (!credential) {
       res.status(400).json({ error: "Google credential is required" });
@@ -2559,9 +2557,6 @@ class NodemailerEmailService {
         subject,
         html
       });
-      console.log(
-        `Order confirmation email sent to ${orderData.customerEmail} for order ${orderData.orderId}`
-      );
     } catch (error) {
       console.error("Failed to send order confirmation email:", error);
     }
@@ -2579,9 +2574,6 @@ class NodemailerEmailService {
         subject,
         html
       });
-      console.log(
-        `Order shipped email sent to ${orderData.customerEmail} for order ${orderData.orderId}`
-      );
     } catch (error) {
       console.error("Failed to send order shipped email:", error);
     }
@@ -2598,9 +2590,6 @@ class NodemailerEmailService {
         subject,
         html
       });
-      console.log(
-        `Order delivered email sent to ${orderData.customerEmail} for order ${orderData.orderId}`
-      );
     } catch (error) {
       console.error("Failed to send order delivered email:", error);
     }
@@ -2608,23 +2597,10 @@ class NodemailerEmailService {
 }
 class MockEmailService {
   async sendOrderConfirmation(orderData) {
-    console.log(
-      `[MOCK EMAIL] Order confirmation sent to ${orderData.customerEmail} for order ${orderData.orderId}`
-    );
-    console.log("Order data:", JSON.stringify(orderData, null, 2));
   }
   async sendOrderShipped(orderData, trackingNumber) {
-    console.log(
-      `[MOCK EMAIL] Order shipped notification sent to ${orderData.customerEmail} for order ${orderData.orderId}`
-    );
-    if (trackingNumber) {
-      console.log(`Tracking number: ${trackingNumber}`);
-    }
   }
   async sendOrderDelivered(orderData) {
-    console.log(
-      `[MOCK EMAIL] Order delivered notification sent to ${orderData.customerEmail} for order ${orderData.orderId}`
-    );
   }
 }
 const emailService = process.env.NODE_ENV === "production" && process.env.NODE_MAILER_EMAIL && process.env.NODE_MAILER_PASS ? new NodemailerEmailService() : new MockEmailService();
@@ -3059,7 +3035,6 @@ const getShiprocketToken = async () => {
       throw new Error(`Shiprocket API is rate limited. Please try again in ${minutesLeft} minutes.`);
     }
     if (cachedToken && tokenExpiry && /* @__PURE__ */ new Date() < tokenExpiry) {
-      console.log("✅ Using cached Shiprocket token");
       return cachedToken;
     }
     const email = process.env.SHIPROCKET_EMAIL;
@@ -3090,7 +3065,6 @@ const getShiprocketToken = async () => {
       tokenExpiry = new Date(Date.now() + 23 * 60 * 60 * 1e3);
       return cachedToken;
     }
-    console.log("🔑 Attempting Shiprocket authentication...");
     lastLoginAttempt = /* @__PURE__ */ new Date();
     loginAttemptCount++;
     const loginData = {
@@ -3116,7 +3090,6 @@ const getShiprocketToken = async () => {
       rateLimitResetTime = null;
       loginAttemptCount = 0;
       consecutiveFailures = 0;
-      console.log("✅ Shiprocket token obtained successfully");
       return cachedToken;
     } else {
       throw new Error("Invalid response from Shiprocket login API");
@@ -3271,7 +3244,6 @@ const createShiprocketOrder = async (orderData) => {
       "https://apiv2.shiprocket.in/v1/external/orders/create/adhoc",
       payload
     );
-    console.log("✅ Shiprocket order created successfully:", response);
     return response;
   } catch (error) {
     console.error("❌ Failed to create Shiprocket order:", error);
@@ -3336,27 +3308,15 @@ const router$8 = express__default.Router();
 let razorpay = null;
 const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
 const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
-console.log("Razorpay initialization:", {
-  keyIdProvided: !!razorpayKeyId,
-  keySecretProvided: !!razorpayKeySecret,
-  keyIdPrefix: razorpayKeyId?.substring(0, 8)
-});
 try {
   if (razorpayKeyId && razorpayKeySecret) {
     razorpay = new Razorpay({
       key_id: razorpayKeyId,
       key_secret: razorpayKeySecret
     });
-    console.log("✅ Razorpay initialized successfully");
   } else {
-    console.warn("⚠️ Razorpay keys not provided, running in demo mode");
-    console.log("Missing keys:", {
-      RAZORPAY_KEY_ID: !razorpayKeyId,
-      RAZORPAY_KEY_SECRET: !razorpayKeySecret
-    });
   }
 } catch (error) {
-  console.error("❌ Razorpay initialization failed:", error);
   razorpay = null;
 }
 router$8.post("/create-razorpay-order", authenticateToken, async (req, res) => {
@@ -3407,7 +3367,6 @@ router$8.post("/create-razorpay-order", authenticateToken, async (req, res) => {
       // Amount in rupees (without tax)
     });
   } catch (error) {
-    console.error("Error creating Razorpay order:", error);
     res.status(500).json({ error: "Failed to create payment order" });
   }
 });
@@ -3462,7 +3421,6 @@ router$8.post("/create-session", authenticateToken, async (req, res) => {
       isDemoMode: false
     });
   } catch (error) {
-    console.error("Error creating checkout session:", error);
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
@@ -3490,7 +3448,6 @@ router$8.post("/verify-razorpay-payment", authenticateToken, async (req, res) =>
       res.status(400).json({ error: "Invalid payment signature" });
     }
   } catch (error) {
-    console.error("Error verifying payment:", error);
     res.status(500).json({ error: "Payment verification failed" });
   }
 });
@@ -3506,22 +3463,7 @@ router$8.post("/razorpay-success", authenticateToken, async (req, res) => {
       shippingAddress
     } = req.body;
     const userId = req.user?.userId;
-    console.log("🔍 Razorpay success payload received:", {
-      razorpay_payment_id: !!razorpay_payment_id,
-      razorpay_order_id: !!razorpay_order_id,
-      razorpay_signature: !!razorpay_signature,
-      orderId: !!orderId,
-      itemsCount: items?.length || 0,
-      orderItemsCount: orderItems?.length || 0,
-      shippingAddress: shippingAddress ? Object.keys(shippingAddress) : "undefined",
-      userId: userId || "guest"
-    });
     const finalItems = orderItems || items || [];
-    console.log("📦 Final items for processing:", {
-      finalItemsCount: finalItems.length,
-      sampleItem: finalItems[0] || "none",
-      allItemKeys: finalItems.length > 0 ? Object.keys(finalItems[0] || {}) : []
-    });
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
       return res.status(400).json({ error: "Missing payment details" });
     }
@@ -3537,7 +3479,6 @@ router$8.post("/razorpay-success", authenticateToken, async (req, res) => {
     try {
       paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
     } catch (error) {
-      console.error("Error fetching payment details:", error);
       return res.status(500).json({ error: "Failed to verify payment" });
     }
     const orderItemsArray = finalItems || [];
@@ -3600,20 +3541,9 @@ router$8.post("/razorpay-success", authenticateToken, async (req, res) => {
       status: "confirmed"
     });
     try {
-      console.log("💾 Attempting to save order:", {
-        orderNumber: `ORD-${Date.now()}`,
-        userId: userId || "guest",
-        itemsCount: orderItemsArray.length,
-        finalAmount,
-        shippingAddress: orderShippingAddress
-      });
       await order.save();
-      console.log("✅ Order saved successfully:", order._id);
       try {
-        console.log("🔗 Creating Shiprocket order for:", order._id);
         if (orderItemsArray.length === 0) {
-          console.warn("⚠️ No items found in order - skipping Shiprocket order creation");
-          console.warn("Available data:", { orderItemsArray, finalItems, items, orderItems });
         } else {
           const shiprocketOrderData = {
             order_id: order._id.toString(),
@@ -3641,29 +3571,15 @@ router$8.post("/razorpay-success", authenticateToken, async (req, res) => {
             sub_total: finalAmount,
             comment: `Order ${order.orderNumber} - ${orderShippingAddress.firstName} ${orderShippingAddress.lastName}`
           };
-          console.log("📦 Shiprocket order data prepared:", {
-            order_id: shiprocketOrderData.order_id,
-            itemsCount: shiprocketOrderData.items.length,
-            items: shiprocketOrderData.items,
-            customer_name: shiprocketOrderData.customer_name,
-            sub_total: shiprocketOrderData.sub_total
-          });
           const shiprocketOrder = await createShiprocketOrderWithDefaults(shiprocketOrderData);
           order.shipment_id = shiprocketOrder.shipment_id;
           order.shiprocket_tracking_url = shiprocketOrder.tracking_url;
           order.order_created_on_shiprocket = true;
           await order.save();
-          console.log("✅ Shiprocket order created successfully:", {
-            orderId: order._id,
-            shipmentId: shiprocketOrder.shipment_id,
-            trackingUrl: shiprocketOrder.tracking_url
-          });
         }
       } catch (shiprocketError) {
-        console.error("❌ Shiprocket order creation failed:", shiprocketError);
       }
     } catch (saveError) {
-      console.error("❌ Order save failed:", saveError);
       return res.status(500).json({
         error: "Failed to create order",
         details: saveError instanceof Error ? saveError.message : "Unknown error"
@@ -3680,7 +3596,6 @@ router$8.post("/razorpay-success", authenticateToken, async (req, res) => {
       paymentId: razorpay_payment_id
     });
   } catch (error) {
-    console.error("Razorpay payment success error:", error);
     res.status(500).json({ error: "Failed to process payment" });
   }
 });
@@ -6277,7 +6192,6 @@ router.put(
       const oldStock = product.stock;
       product.stock = quantity;
       await product.save();
-      console.log(`Inventory Update: ${product.name} stock changed from ${oldStock} to ${quantity}. Reason: ${reason}. Notes: ${notes || "None"}`);
       res.json({
         message: "Stock updated successfully",
         product: {
@@ -6337,7 +6251,6 @@ router.put(
             newStock: update.quantity,
             difference: update.quantity - oldStock
           });
-          console.log(`Bulk Inventory Update: ${product.name} stock changed from ${oldStock} to ${update.quantity}. Reason: ${update.reason}`);
         } catch (error) {
           results.push({
             productId: update.productId,

@@ -1,18 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-
-interface SitemapUrl {
-  loc: string;
-  lastmod?: string;
-  changefreq?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
-  priority?: number;
-}
+import { fileURLToPath } from 'url';
 
 const generateSitemap = () => {
   const baseUrl = 'https://www.kitistore.com';
   const currentDate = new Date().toISOString().split('T')[0];
 
-  const urls: SitemapUrl[] = [
+  const urls = [
     // Static pages
     {
       loc: `${baseUrl}/`,
@@ -80,13 +74,17 @@ ${urls
 </urlset>`;
 
   // Write sitemap to public directory
-  const sitemapPath = path.join(process.cwd(), 'public', 'sitemap.xml');
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const sitemapPath = path.join(__dirname, '..', 'public', 'sitemap.xml');
+  
   fs.writeFileSync(sitemapPath, xml);
   console.log('Sitemap generated successfully at:', sitemapPath);
 };
 
 // Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __filename) {
   generateSitemap();
 }
 
