@@ -31,11 +31,11 @@ try {
       key_secret: razorpayKeySecret,
     });
   } else {
-    console.warn("⚠️ Razorpay keys not provided, running in demo mode");
+    // Razorpay keys not provided, running in demo mode
 
   }
 } catch (error) {
-  console.error("❌ Razorpay initialization failed:", error);
+  // Razorpay initialization failed
   razorpay = null;
 }
 
@@ -101,7 +101,7 @@ router.post("/create-razorpay-order", authenticateToken, async (req: Request, re
       totalAmount: totalAmount, // Amount in rupees (without tax)
     });
   } catch (error) {
-    console.error("Error creating Razorpay order:", error);
+    // Error creating Razorpay order
     res.status(500).json({ error: "Failed to create payment order" });
   }
 });
@@ -171,7 +171,7 @@ router.post("/create-session", authenticateToken, async (req: Request, res: Resp
       isDemoMode: false
     });
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    // Error creating checkout session
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
@@ -210,7 +210,7 @@ router.post("/verify-razorpay-payment", authenticateToken, async (req: Request, 
       res.status(400).json({ error: "Invalid payment signature" });
     }
   } catch (error) {
-    console.error("Error verifying payment:", error);
+    // Error verifying payment
     res.status(500).json({ error: "Payment verification failed" });
   }
 });
@@ -260,7 +260,7 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
     try {
       paymentDetails = await razorpay!.payments.fetch(razorpay_payment_id);
     } catch (error) {
-      console.error("Error fetching payment details:", error);
+      // Error fetching payment details
       return res.status(500).json({ error: "Failed to verify payment" });
     }
 
@@ -341,8 +341,7 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
         
         // Only create Shiprocket order if we have items
         if (orderItemsArray.length === 0) {
-          console.warn("⚠️ No items found in order - skipping Shiprocket order creation");
-          console.warn("Available data:", { orderItemsArray, finalItems, items, orderItems });
+          // No items found in order - skipping Shiprocket order creation
         } else {
           const shiprocketOrderData = {
             order_id: order._id.toString(),
@@ -380,13 +379,13 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
         }
 
       } catch (shiprocketError) {
-        console.error("❌ Shiprocket order creation failed:", shiprocketError);
+        // Shiprocket order creation failed
         // Don't fail the entire order - just log the error
         // Order is still saved locally even if Shiprocket fails
       }
 
     } catch (saveError) {
-      console.error("❌ Order save failed:", saveError);
+      // Order save failed
       return res.status(500).json({ 
         error: "Failed to create order", 
         details: saveError instanceof Error ? saveError.message : "Unknown error"
@@ -406,7 +405,7 @@ router.post("/razorpay-success", authenticateToken, async (req: Request, res: Re
       paymentId: razorpay_payment_id,
     });
   } catch (error) {
-    console.error("Razorpay payment success error:", error);
+    // Razorpay payment success error
     res.status(500).json({ error: "Failed to process payment" });
   }
 });

@@ -97,7 +97,7 @@ export default function RazorpayPaymentForm({
       // Check if we're in demo mode or live mode
       if (orderData.isDemoMode) {
         // Handle demo mode (should not happen in live)
-        console.warn("Demo mode detected in live environment");
+        // Demo mode detected in live environment
         toast.error("Payment gateway is in demo mode");
         return;
       }
