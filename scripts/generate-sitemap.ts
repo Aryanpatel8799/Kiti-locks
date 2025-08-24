@@ -10,7 +10,7 @@ interface SitemapUrl {
 
 const generateSitemap = () => {
   const baseUrl = 'https://www.kitistore.com';
-  const currentDate = new Date().toISOString().split('T')[0];
+  const currentDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
 
   const urls: SitemapUrl[] = [
     // Static pages
