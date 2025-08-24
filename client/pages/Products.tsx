@@ -587,10 +587,10 @@ export default function Products() {
 
   const FilterContent = () => (
     <div className="space-y-6">
-      {/* Elegant Category Filter */}
-      <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-5 border border-gray-200 shadow-sm">
-        <Label className="text-sm font-semibold mb-3 text-gray-800 flex items-center gap-2">
-          <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+      {/* Category Filter */}
+      <div className="bg-white rounded-lg p-4 border shadow-sm">
+        <Label className="text-sm font-semibold mb-3 text-gray-900 flex items-center gap-2">
+          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
           Category
         </Label>
         <Select
@@ -599,18 +599,18 @@ export default function Products() {
             updateFilters({ category: value === "all" ? "" : value })
           }
         >
-          <SelectTrigger className="bg-white backdrop-blur-sm border border-gray-300 focus:border-gray-500 focus:ring-gray-200 rounded-xl transition-all duration-300 hover:shadow-md">
+          <SelectTrigger className="bg-white/80 backdrop-blur-sm border-2 border-blue-300 focus:border-blue-500 focus:ring-blue-200 rounded-xl transition-all duration-300 hover:shadow-lg">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
-          <SelectContent className="bg-white backdrop-blur-xl border-gray-200 rounded-xl">
-            <SelectItem value="all" className="focus:bg-gray-50 rounded-lg">
+          <SelectContent className="bg-white/95 backdrop-blur-xl border-blue-200 rounded-xl">
+            <SelectItem value="all" className="focus:bg-blue-50 rounded-lg">
               All Categories
             </SelectItem>
             {categories?.map((category) => (
               <SelectItem 
                 key={category._id} 
                 value={category.slug}
-                className="focus:bg-gray-50 rounded-lg"
+                className="focus:bg-blue-50 rounded-lg"
               >
                 {category.name}
               </SelectItem>
@@ -619,19 +619,19 @@ export default function Products() {
         </Select>
       </div>
 
-      {/* Refined Price Range */}
-      <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-5 border border-gray-200 shadow-sm">
-        <Label className="text-sm font-semibold mb-3 text-gray-800 flex items-center gap-2">
-          <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+      {/* Price Range */}
+      <div className="bg-white rounded-lg p-4 border shadow-sm">
+        <Label className="text-sm font-semibold mb-3 text-gray-900 flex items-center gap-2">
+          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
           Price Range
         </Label>
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-700 font-medium bg-gray-100 px-3 py-1 rounded-full border">
+            <span className="text-gray-700 font-medium bg-gray-100 px-3 py-1 rounded-md">
               {formatPrice(filters.minPrice)}
             </span>
-            <span className="text-gray-500 font-medium">to</span>
-            <span className="text-gray-700 font-medium bg-gray-100 px-3 py-1 rounded-full border">
+            <span className="text-gray-400 font-medium">to</span>
+            <span className="text-gray-700 font-medium bg-gray-100 px-3 py-1 rounded-md">
               {formatPrice(filters.maxPrice)}
             </span>
           </div>
@@ -645,7 +645,7 @@ export default function Products() {
               max={10000}
               min={0}
               step={100}
-              className="w-full [&>span:first-child]:bg-gradient-to-r [&>span:first-child]:from-gray-600 [&>span:first-child]:to-gray-800"
+              className="w-full"
             />
             <div className="flex justify-between text-xs text-gray-500 mt-2">
               <span>{formatPrice(0)}</span>
@@ -655,15 +655,15 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Refined Rating Filter */}
-      <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-5 border border-gray-200 shadow-sm">
-        <Label className="text-sm font-semibold mb-3 text-gray-800 flex items-center gap-2">
-          <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+      {/* Rating Filter */}
+      <div className="bg-white rounded-lg p-4 border shadow-sm">
+        <Label className="text-sm font-semibold mb-3 text-gray-900 flex items-center gap-2">
+          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
           Minimum Rating
         </Label>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1 rounded-full border">
+            <span className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1 rounded-md">
               {filters.minRating === 0 ? 'Any Rating' : `${filters.minRating}+ Stars`}
             </span>
             {filters.minRating > 0 && (
@@ -691,7 +691,7 @@ export default function Products() {
               max={5}
               min={0}
               step={0.5}
-              className="w-full [&>span:first-child]:bg-gradient-to-r [&>span:first-child]:from-gray-600 [&>span:first-child]:to-gray-800"
+              className="w-full"
             />
             <div className="flex justify-between text-xs text-gray-500 mt-2">
               <span>Any</span>
@@ -701,57 +701,57 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Refined Quick Filters */}
-      <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-5 border border-gray-200 shadow-sm">
-        <Label className="text-sm font-semibold mb-3 text-gray-800 flex items-center gap-2">
-          <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+      {/* Quick Filters */}
+      <div className="bg-white rounded-lg p-4 border shadow-sm">
+        <Label className="text-sm font-semibold mb-3 text-gray-900 flex items-center gap-2">
+          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
           Quick Filters
         </Label>
         <div className="space-y-3">
-          <div className="flex items-center space-x-3 p-3 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 transition-all duration-300 hover:bg-white">
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
             <Checkbox
               id="inStock"
               checked={filters.inStock}
               onCheckedChange={(checked) => updateFilters({ inStock: !!checked })}
-              className="border-gray-400 data-[state=checked]:bg-gray-600"
+              className="border-gray-400"
             />
-            <label htmlFor="inStock" className="text-sm text-gray-700 font-medium cursor-pointer">
+            <label htmlFor="inStock" className="text-sm text-gray-800 font-medium cursor-pointer">
               In Stock Only
             </label>
           </div>
-          <div className="flex items-center space-x-3 p-3 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 transition-all duration-300 hover:bg-white">
+          <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
             <Checkbox
               id="featured"
               checked={filters.featured}
               onCheckedChange={(checked) => updateFilters({ featured: !!checked })}
-              className="border-gray-400 data-[state=checked]:bg-gray-600"
+              className="border-gray-400"
             />
-            <label htmlFor="featured" className="text-sm text-gray-700 font-medium cursor-pointer">
+            <label htmlFor="featured" className="text-sm text-gray-800 font-medium cursor-pointer">
               Featured Products
             </label>
           </div>
         </div>
       </div>
 
-      {/* Refined Tags Filter */}
+      {/* Tags Filter */}
       {allTags.length > 0 && (
-        <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-5 border border-gray-200 shadow-sm">
-          <Label className="text-sm font-semibold mb-3 text-gray-800 flex items-center gap-2">
-            <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+        <div className="bg-white rounded-lg p-4 border shadow-sm">
+          <Label className="text-sm font-semibold mb-3 text-gray-900 flex items-center gap-2">
+            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
             Tags
           </Label>
           <div className="space-y-2">
             {allTags?.slice(0, 10).map((tag) => (
-              <div key={tag} className="flex items-center space-x-2 p-2 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 transition-all duration-300 hover:bg-white">
+              <div key={tag} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
                 <Checkbox
                   id={tag}
                   checked={filters.tags.includes(tag)}
                   onCheckedChange={() => toggleTag(tag)}
-                  className="border-gray-400 data-[state=checked]:bg-gray-600"
+                  className="border-gray-400"
                 />
                 <label
                   htmlFor={tag}
-                  className="text-sm text-gray-700 font-medium capitalize cursor-pointer"
+                  className="text-sm text-gray-800 font-medium capitalize cursor-pointer"
                 >
                   {tag.replace("-", " ")}
                 </label>
@@ -761,11 +761,11 @@ export default function Products() {
         </div>
       )}
 
-      {/* Refined Clear Filters */}
+      {/* Enhanced Clear Filters */}
       <Button 
         variant="outline" 
         onClick={clearFilters} 
-        className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white border-0 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105 font-medium hover:from-gray-800 hover:to-black"
+        className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-105 font-semibold"
       >
         <X className="w-4 h-4 mr-2" />
         Clear All Filters
@@ -774,70 +774,139 @@ export default function Products() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Elegant Header */}
-        {/* <motion.div 
+        {/* Search and Controls */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-6 sm:mb-8"
+          className="mb-8"
         >
-          <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-slate-800 to-gray-900 rounded-3xl p-8 sm:p-12 shadow-2xl border border-gray-700">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-white/5 to-transparent rounded-full -translate-y-48 translate-x-48"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-white/5 to-transparent rounded-full translate-y-32 -translate-x-32"></div>
-            
-            <div className="relative z-10">
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-light text-white mb-6 leading-tight tracking-wide">
-                Premium Kitchen
-                <span className="block font-bold bg-gradient-to-r from-gray-300 to-white bg-clip-text text-transparent">
-                  Hardware Collection
-                </span>
-              </h1>
-              <p className="text-gray-300 text-base sm:text-lg max-w-3xl leading-relaxed mb-8 font-light">
-                Discover our complete range of premium kitchen hardware and
-                accessories by Kiti Locks - crafted for durability and elegance
-              </p>
-              <div className="flex flex-wrap items-center gap-6">
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-                  <div className="w-2 h-2 bg-white rounded-full opacity-70"></div>
-                  <span className="font-medium text-white text-sm">{products.length} Products Available</span>
+          <div className="bg-white rounded-lg p-4 shadow-sm border">
+            <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+              {/* Search */}
+              <div className="relative flex-1 max-w-lg w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="search"
+                  placeholder="Search products..."
+                  value={filters.search}
+                  onChange={(e) => updateFilters({ search: e.target.value })}
+                  className="pl-10 pr-4 py-2 border-gray-300 focus:border-gray-500 focus:ring-gray-200"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                {/* Sort */}
+                <div className="relative">
+                  <Select
+                    value={`${filters.sort}-${filters.order}`}
+                    onValueChange={(value) => {
+                      const [sort, order] = value.split("-");
+                      updateFilters({ sort, order });
+                    }}
+                  >
+                    <SelectTrigger className="w-full sm:w-48 border-gray-300">
+                      <div className="flex items-center gap-2">
+                        <SlidersHorizontal className="w-4 h-4 text-gray-500" />
+                        <SelectValue placeholder="Sort by..." />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="createdAt-desc">
+                        Newest First
+                      </SelectItem>
+                      <SelectItem value="price-asc" className="focus:bg-purple-50 rounded-lg">
+                        Price: Low to High
+                      </SelectItem>
+                      <SelectItem value="price-desc" className="focus:bg-purple-50 rounded-lg">
+                        Price: High to Low
+                      </SelectItem>
+                      <SelectItem value="name-asc" className="focus:bg-purple-50 rounded-lg">
+                        Name: A to Z
+                      </SelectItem>
+                      <SelectItem value="averageRating-desc" className="focus:bg-purple-50 rounded-lg">
+                        Highest Rated
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-                  <div className="w-2 h-2 bg-white rounded-full opacity-70"></div>
-                  <span className="font-medium text-white text-sm">Premium Quality</span>
-                </div>
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-                  <div className="w-2 h-2 bg-white rounded-full opacity-70"></div>
-                  <span className="font-medium text-white text-sm">Trusted Worldwide</span>
+                
+                {/* Mobile Filter Button */}
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="lg:hidden w-full sm:w-auto"
+                    >
+                      <Filter className="w-4 h-4 mr-2" />
+                      Filters
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="bg-white">
+                    <SheetHeader>
+                      <SheetTitle className="text-gray-900 flex items-center gap-2">
+                        <SlidersHorizontal className="w-5 h-5 text-gray-600" />
+                        Filters
+                      </SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6">
+                      <FilterContent />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+
+                {/* View Mode Toggle */}
+                <div className="flex items-center bg-white border rounded-lg overflow-hidden">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className={`rounded-none text-xs sm:text-sm ${
+                      viewMode === "grid" 
+                        ? "bg-gray-900 text-white" 
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                    Grid
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className={`rounded-none text-xs sm:text-sm ${
+                      viewMode === "list" 
+                        ? "bg-gray-900 text-white" 
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <List className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                    List
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
-        </motion.div> */}
-
-        {/* Refined Search and Controls */}
-
+        </motion.div>
 
         <div className="flex gap-6 lg:gap-8">
-          {/* Elegant Desktop Filters Sidebar */}
+          {/* Desktop Filters Sidebar */}
           <div className="hidden lg:block w-72 flex-shrink-0">
             <div className="sticky top-4 space-y-4">
-              <Card className="bg-white/90 backdrop-blur-xl border-2 border-gray-200/50 shadow-2xl rounded-2xl overflow-hidden">
+              <Card className="bg-white border shadow-sm rounded-lg overflow-hidden">
                 <CardContent className="p-0">
-                  <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-white p-6">
+                  <div className="bg-gray-100 text-gray-900 p-4 border-b">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
-                        <SlidersHorizontal className="w-5 h-5" />
-                      </div>
+                      <SlidersHorizontal className="w-5 h-5 text-gray-600" />
                       <div>
-                        <h2 className="font-semibold text-lg">Filters</h2>
-                        <p className="text-gray-300 text-sm mt-1">Find exactly what you need</p>
+                        <h2 className="font-semibold text-base">Filters</h2>
+                        <p className="text-gray-600 text-sm mt-1">Refine your search</p>
                       </div>
                     </div>
                   </div>
-                  <div className="p-6">
+                  <div className="p-4">
                     <FilterContent />
                   </div>
                 </CardContent>
@@ -845,34 +914,33 @@ export default function Products() {
             </div>
           </div>
 
-          {/* Enhanced Products Grid */}
+          {/* Products Grid */}
           <div className="flex-1">
-            {/* Elegant Results count */}
-            {/* <motion.div 
+            {/* Results count */}
+            <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="mb-6"
             >
-              <div className="bg-white/90 backdrop-blur-xl rounded-2xl px-6 py-4 border border-gray-200/50 shadow-lg">
+              <div className="bg-white rounded-lg px-4 py-3 border shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-3 h-3 bg-gray-600 rounded-full animate-pulse"></div>
-                    <span className="text-gray-900 font-semibold text-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-900 font-medium">
                       {products.length} Products Found
                     </span>
-                    <span className="text-gray-500 text-sm bg-gray-100 px-3 py-1 rounded-full">
+                    <span className="text-gray-500 text-sm">
                       of {pagination.totalProducts} total
                     </span>
                   </div>
                   {products.length > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-gray-700 bg-gradient-to-r from-gray-100 to-slate-100 px-4 py-2 rounded-full border border-gray-200">
-                      <Star className="w-4 h-4 text-gray-600" />
+                    <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-md">
+                      <Star className="w-4 h-4 text-gray-500" />
                       Premium Quality
                     </div>
                   )}
                 </div>
               </div>
-            </motion.div> */}
+            </motion.div>
 
             {loading ? (
               <div className="space-y-6">
@@ -942,8 +1010,8 @@ export default function Products() {
                     className="w-full"
                   >
                     <Link to={`/products/${product.slug}`}>
-                      <Card className="group cursor-pointer hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200 hover:border-gray-300 bg-white h-full hover:scale-[1.02]">
-                        <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+                      <Card className="group cursor-pointer hover:shadow-2xl transition-all duration-500 overflow-hidden border-2 border-transparent hover:border-indigo-200 bg-white/80 backdrop-blur-sm h-full hover:scale-[1.02]">
+                        <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                           {product.images.length > 0 ? (
                             <OptimizedImage
                               src={product.images[0]}
@@ -954,22 +1022,22 @@ export default function Products() {
                               height={400}
                             />
                           ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                               <span className="text-gray-500 text-sm sm:text-base font-medium">No Image</span>
                             </div>
                           )}
                           <motion.div
                             initial={{ opacity: 0 }}
                             whileHover={{ opacity: 1 }}
-                            className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent flex items-center justify-center"
+                            className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex items-center justify-center"
                           >
                             <motion.div
                               initial={{ scale: 0, rotate: -180 }}
                               whileHover={{ scale: 1, rotate: 0 }}
                               transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
-                              className="bg-white rounded-full p-3 sm:p-4 shadow-xl border border-gray-200"
+                              className="bg-white rounded-full p-3 sm:p-4 shadow-2xl border-2 border-indigo-200"
                             >
-                              <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                              <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
                             </motion.div>
                           </motion.div>
                           <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
@@ -980,10 +1048,10 @@ export default function Products() {
                               <Button
                                 size="sm"
                                 variant="secondary"
-                                className={`w-8 h-8 sm:w-10 sm:h-10 p-0 rounded-full bg-white/95 backdrop-blur-sm hover:bg-white shadow-lg border transition-all duration-300 ${
+                                className={`w-8 h-8 sm:w-10 sm:h-10 p-0 rounded-full bg-white/95 backdrop-blur-sm hover:bg-white shadow-xl border-2 transition-all duration-300 ${
                                   isInWishlist(product._id)
-                                    ? "border-red-300 text-red-500"
-                                    : "border-gray-200 text-gray-600 hover:border-red-300 hover:text-red-500"
+                                    ? "border-rose-300 text-rose-500"
+                                    : "border-gray-200 text-gray-600 hover:border-rose-300 hover:text-rose-500"
                                 }`}
                                 onClick={(e) =>
                                   handleToggleWishlist(product, e)
@@ -1006,7 +1074,7 @@ export default function Products() {
                             ) > 0 && (
                               <Badge
                                 variant="destructive"
-                                className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-red-600 text-white text-xs sm:text-sm font-semibold shadow-lg border-0"
+                                className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs sm:text-sm font-bold shadow-lg border-0"
                               >
                                 -
                                 {calculateDiscount(
@@ -1019,7 +1087,7 @@ export default function Products() {
                           {product.stock <= 5 && product.stock > 0 && (
                             <Badge
                               variant="secondary"
-                              className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 bg-orange-500 text-white text-xs sm:text-sm font-semibold shadow-lg border-0"
+                              className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs sm:text-sm font-bold shadow-lg border-0"
                             >
                               Only {product.stock} left
                             </Badge>
@@ -1027,7 +1095,7 @@ export default function Products() {
                           {product.stock === 0 && (
                             <Badge
                               variant="destructive"
-                              className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 bg-gray-500 text-white text-xs sm:text-sm font-semibold shadow-lg border-0"
+                              className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs sm:text-sm font-bold shadow-lg border-0"
                             >
                               Out of Stock
                             </Badge>
@@ -1037,17 +1105,17 @@ export default function Products() {
                           <div className="mb-3">
                             <Badge 
                               variant="outline" 
-                              className="text-xs bg-gray-50 border-gray-300 text-gray-700 font-medium"
+                              className="text-xs bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200 text-indigo-700 font-medium"
                             >
                               {product.category.name}
                             </Badge>
                           </div>
-                          <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2 text-sm sm:text-base leading-snug">
+                          <h3 className="font-bold text-gray-900 mb-2 group-hover:text-indigo-700 transition-colors line-clamp-2 text-sm sm:text-base leading-snug">
                             {product.name}
                           </h3>
-                          {/* Elegant Rating */}
+                          {/* Enhanced Rating */}
                           {product.reviewCount > 0 && (
-                            <div className="flex items-center gap-2 mb-3 p-2 bg-amber-50 rounded-lg border border-amber-200">
+                            <div className="flex items-center gap-2 mb-3 p-2 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200">
                               <div className="flex items-center">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <Star
@@ -1060,14 +1128,14 @@ export default function Products() {
                                   />
                                 ))}
                               </div>
-                              <span className="text-xs text-amber-700 font-medium">
+                              <span className="text-xs text-amber-700 font-semibold">
                                 ({product.reviewCount})
                               </span>
                             </div>
                           )}
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex flex-col">
-                              <span className="text-lg sm:text-xl font-bold text-gray-900">
+                              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                                 {formatPrice(product.price)}
                               </span>
                               {product.comparePrice && (
@@ -1083,7 +1151,7 @@ export default function Products() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-gray-900 text-white border-0 rounded-xl transition-all duration-300 hover:shadow-lg hover:bg-gray-800 font-medium"
+                                className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-0 rounded-xl transition-all duration-300 hover:shadow-lg hover:from-indigo-600 hover:to-purple-600 font-semibold"
                                 disabled={product.stock === 0}
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -1097,14 +1165,14 @@ export default function Products() {
                             </motion.div>
                           </div>
 
-                          {/* Elegant Tags */}
+                          {/* Enhanced Tags */}
                           {product.tags.length > 0 && (
                             <div className="mt-4 flex flex-wrap gap-1">
                               {product.tags.slice(0, 3).map((tag) => (
                                 <Badge
                                   key={tag}
                                   variant="secondary"
-                                  className="text-xs px-2 py-1 bg-gray-100 text-gray-600 border border-gray-200 rounded-full font-medium"
+                                  className="text-xs px-2 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-300 rounded-full font-medium"
                                 >
                                   {tag.replace("-", " ")}
                                 </Badge>
@@ -1112,7 +1180,7 @@ export default function Products() {
                               {product.tags.length > 3 && (
                                 <Badge
                                   variant="secondary"
-                                  className="text-xs px-2 py-1 bg-gray-200 text-gray-700 border border-gray-300 rounded-full font-semibold"
+                                  className="text-xs px-2 py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border border-indigo-300 rounded-full font-bold"
                                 >
                                   +{product.tags.length - 3}
                                 </Badge>
@@ -1151,7 +1219,7 @@ export default function Products() {
               </motion.div>
             )}
 
-            {/* Elegant Pagination */}
+            {/* Enhanced Pagination */}
             {pagination.totalPages > 1 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -1159,7 +1227,7 @@ export default function Products() {
                 transition={{ delay: 0.4 }}
                 className="mt-12 flex justify-center items-center"
               >
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-xl">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-200 shadow-xl">
                   <Pagination>
                     <PaginationContent className="flex items-center gap-2">
                       <PaginationItem>
@@ -1174,8 +1242,8 @@ export default function Products() {
                           className={`${
                             pagination.currentPage === 1
                               ? "pointer-events-none opacity-50 bg-gray-100 text-gray-400"
-                              : "bg-gray-900 text-white hover:bg-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300"
-                          } rounded-xl px-4 py-2 font-medium`}
+                              : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                          } rounded-xl px-4 py-2 font-semibold`}
                         />
                       </PaginationItem>
 
@@ -1195,7 +1263,7 @@ export default function Products() {
                                   e.preventDefault();
                                   setCurrentPage(1);
                                 }}
-                                className="rounded-xl px-4 py-2 border-0 bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300 font-medium"
+                                className="rounded-xl px-4 py-2 border-0 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-indigo-100 hover:to-purple-100 hover:text-indigo-700 transition-all duration-300 font-semibold"
                               >
                                 1
                               </PaginationLink>
@@ -1221,10 +1289,10 @@ export default function Products() {
                                   setCurrentPage(i);
                                 }}
                                 isActive={pagination.currentPage === i}
-                                className={`rounded-xl px-4 py-2 border-0 font-medium transition-all duration-300 ${
+                                className={`rounded-xl px-4 py-2 border-0 font-semibold transition-all duration-300 ${
                                   pagination.currentPage === i
-                                    ? "bg-gray-900 text-white shadow-lg"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900"
+                                    ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg"
+                                    : "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-indigo-100 hover:to-purple-100 hover:text-indigo-700"
                                 }`}
                               >
                                 {i}
@@ -1250,7 +1318,7 @@ export default function Products() {
                                   e.preventDefault();
                                   setCurrentPage(pagination.totalPages);
                                 }}
-                                className="rounded-xl px-4 py-2 border-0 bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300 font-medium"
+                                className="rounded-xl px-4 py-2 border-0 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-indigo-100 hover:to-purple-100 hover:text-indigo-700 transition-all duration-300 font-semibold"
                               >
                                 {pagination.totalPages}
                               </PaginationLink>
@@ -1273,8 +1341,8 @@ export default function Products() {
                           className={`${
                             pagination.currentPage === pagination.totalPages
                               ? "pointer-events-none opacity-50 bg-gray-100 text-gray-400"
-                              : "bg-gray-900 text-white hover:bg-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300"
-                          } rounded-xl px-4 py-2 font-medium`}
+                              : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                          } rounded-xl px-4 py-2 font-semibold`}
                         />
                       </PaginationItem>
                     </PaginationContent>
@@ -1282,10 +1350,10 @@ export default function Products() {
                   
                   {/* Page Info */}
                   <div className="mt-4 text-center">
-                    <p className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-xl border border-gray-200">
+                    <p className="text-sm text-gray-600 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-2 rounded-xl border border-gray-200">
                       Showing {(pagination.currentPage - 1) * pagination.limit + 1} to{" "}
                       {Math.min(pagination.currentPage * pagination.limit, pagination.totalProducts)} of{" "}
-                      <span className="font-semibold text-gray-900">{pagination.totalProducts}</span> products
+                      <span className="font-bold text-indigo-600">{pagination.totalProducts}</span> products
                     </p>
                   </div>
                 </div>

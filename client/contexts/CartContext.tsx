@@ -58,7 +58,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Helper function to make authenticated API calls
   const apiCall = (url: string, options: RequestInit = {}) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
     return fetch(url, {
       ...options,
       headers: {
@@ -267,7 +267,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       // Make API call in background
-      const response = await apiCall(`/api/cart/${productId}`, {
+      const response = await apiCall(`/api/cart/remove/${productId}`, {
         method: "DELETE",
       });
 

@@ -30,9 +30,9 @@ export default function Cart() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center max-w-md mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-md border border-gray-200">
-          <div className="h-16 w-16 sm:h-20 sm:w-20 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ShoppingBag className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+        <div className="text-center max-w-md mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="h-16 w-16 sm:h-20 sm:w-20 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+            <ShoppingBag className="h-8 w-8 sm:h-10 sm:w-10 text-gray-600" />
           </div>
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
             Sign in to view your cart
@@ -116,7 +116,7 @@ export default function Cart() {
     }
   };
 
-  const shipping = totalAmount > 2000 ? 0 : 100;
+  const shipping = totalAmount > 100 ? 0 : 10;
   const finalTotal = totalAmount + shipping;
 
   if (loading) {
@@ -135,24 +135,26 @@ export default function Cart() {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center max-w-md mx-auto">
-            <div className="h-24 w-24 sm:h-32 sm:w-32 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ShoppingBag className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200">
+              <div className="h-24 w-24 sm:h-32 sm:w-32 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                <ShoppingBag className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+                Your cart is empty
+              </h2>
+              <p className="text-gray-600 text-sm sm:text-base mb-8 leading-relaxed">
+                Looks like you haven't added any items to your cart yet. Discover our amazing products!
+              </p>
+              <Button 
+                asChild 
+                className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white"
+              >
+                <Link to="/products">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Continue Shopping
+                </Link>
+              </Button>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-              Your cart is empty
-            </h2>
-            <p className="text-gray-600 text-sm sm:text-base mb-8 leading-relaxed">
-              Looks like you haven't added any items to your cart yet. Discover our amazing products!
-            </p>
-            <Button 
-              asChild 
-              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white"
-            >
-              <Link to="/products">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Continue Shopping
-              </Link>
-            </Button>
           </div>
         </div>
       </div>
@@ -161,28 +163,34 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        {/* Simple Header */}
-        <div className="mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        {/* Header */}
+        <div className="mb-8 lg:mb-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-3">
+                <ShoppingBag className="w-8 h-8 text-gray-600" />
                 Shopping Cart
               </h1>
-              <p className="text-gray-600 mt-1">
-                {itemsCount} {itemsCount === 1 ? "item" : "items"} in your cart
+              <p className="text-gray-600 text-sm sm:text-base mt-2 flex items-center gap-2">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  {itemsCount} {itemsCount === 1 ? "item" : "items"}
+                </span>
+                Ready for checkout
               </p>
             </div>
-            <Button 
-              asChild 
-              variant="outline" 
-              className="bg-white hover:bg-gray-50 border-gray-300 text-gray-700"
-            >
-              <Link to="/products">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Continue Shopping
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                asChild 
+                variant="outline" 
+                className="w-full sm:w-auto bg-white hover:bg-gray-50 border-gray-300 text-gray-700 hover:text-gray-900"
+              >
+                <Link to="/products">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Continue Shopping
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -203,7 +211,7 @@ export default function Cart() {
                       variant="ghost"
                       size="sm"
                       onClick={handleClearCart}
-                      className="text-red-200 hover:text-white hover:bg-red-500/20"
+                      className="text-red-200 hover:text-white hover:bg-red-500/20 w-full sm:w-auto"
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
                       Clear Cart
@@ -237,18 +245,20 @@ export default function Cart() {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0">
                           <div className="flex-1 pr-4">
-                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
-                              {item.product ? item.product.name : "Unknown Product"}
-                            </h3>
-                            <div className="flex items-center gap-2 mb-3">
-                              <Badge variant="outline" className="text-xs bg-gray-50 border-gray-200 text-gray-700">
-                                {item.product && item.product.category ? item.product.category.name : "Unknown Category"}
-                              </Badge>
-                              {item.product && item.product.stock <= 5 && (
-                                <Badge variant="outline" className="text-xs bg-orange-50 border-orange-200 text-orange-700">
-                                  Only {item.product.stock} left!
+                            <div className="relative">
+                              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-gray-700 transition-colors">
+                                {item.product ? item.product.name : "Unknown Product"}
+                              </h3>
+                              <div className="flex items-center gap-2 mb-3">
+                                <Badge variant="outline" className="text-xs bg-gray-50 border-gray-200 text-gray-700">
+                                  {item.product && item.product.category ? item.product.category.name : "Unknown Category"}
                                 </Badge>
-                              )}
+                                {item.product && item.product.stock <= 5 && (
+                                  <Badge variant="outline" className="text-xs bg-orange-50 border-orange-200 text-orange-700">
+                                    Only {item.product.stock} left!
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                             {item.variant && (
                               <div className="mb-3">
@@ -275,21 +285,23 @@ export default function Cart() {
                           </div>
 
                           {/* Remove Button */}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="w-10 h-10 p-0 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-all duration-200 border border-red-200 hover:border-red-500"
-                            onClick={() => item.product && handleRemoveItem(item.product._id)}
-                            disabled={item.product ? updatingItems.has(item.product._id) : true}
-                          >
-                            <X className="w-5 h-5" />
-                          </Button>
+                          <div className="relative">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="w-10 h-10 p-0 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-all duration-200 border border-red-200 hover:border-red-500"
+                              onClick={() => item.product && handleRemoveItem(item.product._id)}
+                              disabled={item.product ? updatingItems.has(item.product._id) : true}
+                            >
+                              <X className="w-5 h-5" />
+                            </Button>
+                          </div>
                         </div>
 
                         {/* Quantity Controls and Total */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 pt-4 border-t border-gray-100">
                           <div className="flex items-center gap-3">
-                            <span className="text-sm font-semibold text-gray-700">Quantity:</span>
+                            <span className="text-sm font-medium text-gray-700">Quantity:</span>
                             <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-1">
                               <Button
                                 size="sm"
@@ -316,7 +328,7 @@ export default function Cart() {
                                     handleQuantityChange(item.product._id, value);
                                   }
                                 }}
-                                className="w-16 h-8 text-center border-0 bg-white text-sm font-semibold"
+                                className="w-16 h-8 text-center border-0 bg-white text-sm font-medium"
                                 disabled={item.product ? updatingItems.has(item.product._id) : true}
                               />
 
@@ -340,7 +352,7 @@ export default function Cart() {
 
                           <div className="flex items-center justify-between sm:justify-end gap-4">
                             <span className="text-sm text-gray-600">Subtotal:</span>
-                            <span className="text-lg font-bold text-gray-900">
+                            <span className="text-lg font-semibold text-gray-900">
                               {item.product ? formatPrice(item.product.price * item.quantity) : "N/A"}
                             </span>
                           </div>
@@ -374,16 +386,16 @@ export default function Cart() {
                     <span className="text-gray-600">Shipping</span>
                     <span className="font-semibold text-lg">
                       {shipping === 0 ? (
-                        <span className="text-gray-900">Free</span>
+                        <span className="text-green-600">Free</span>
                       ) : (
                         formatPrice(shipping)
                       )}
                     </span>
                   </div>
 
-                  {totalAmount <= 2000 && (
+                  {totalAmount <= 100 && (
                     <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                      Add {formatPrice(2000 - totalAmount)} more for free shipping!
+                      Add {formatPrice(100 - totalAmount)} more for free shipping!
                     </div>
                   )}
                 </div>
@@ -401,7 +413,7 @@ export default function Cart() {
                   asChild 
                   className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white text-lg font-medium"
                 >
-                  <Link to="/checkout/form">
+                  <Link to="/checkout">
                     Proceed to Checkout
                   </Link>
                 </Button>

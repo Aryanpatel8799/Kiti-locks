@@ -73,7 +73,6 @@ const userSchema = new Schema(
     location: { type: String, trim: true },
     googleId: { type: String, unique: true, sparse: true },
     isVerified: { type: Boolean, default: false },
-    isActive: { type: Boolean, default: true },
     preferences: {
       newsletter: { type: Boolean, default: true },
       notifications: { type: Boolean, default: true },
@@ -1861,65 +1860,6 @@ router$c.put(
     }
   }
 );
-router$c.put(
-  "/:productId",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const { productId } = req.params;
-      const { quantity } = req.body;
-      if (!getConnectionStatus()) {
-        res.status(503).json({ error: "Database connection required" });
-        return;
-      }
-      if (!productId || quantity === void 0) {
-        res.status(400).json({ error: "Product ID and quantity are required" });
-        return;
-      }
-      if (quantity < 0) {
-        res.status(400).json({ error: "Quantity must be at least 0" });
-        return;
-      }
-      const authReq = req;
-      const user = await UserModel.findById(authReq.user?.userId);
-      if (!user) {
-        res.status(404).json({ error: "User not found" });
-        return;
-      }
-      if (!user.cart) {
-        user.cart = [];
-      }
-      const cartItemIndex = user.cart.findIndex(
-        (item) => item.product.toString() === productId
-      );
-      if (cartItemIndex === -1) {
-        res.status(404).json({ error: "Item not found in cart" });
-        return;
-      }
-      if (quantity === 0) {
-        user.cart.splice(cartItemIndex, 1);
-      } else {
-        user.cart[cartItemIndex].quantity = quantity;
-      }
-      await user.save();
-      await user.populate({
-        path: "cart.product",
-        model: "Product",
-        populate: {
-          path: "category",
-          model: "Category"
-        }
-      });
-      res.json({
-        message: "Cart updated successfully",
-        cart: user.cart
-      });
-    } catch (error) {
-      console.error("Update cart item error:", error);
-      res.status(500).json({ error: "Failed to update cart item" });
-    }
-  }
-);
 router$c.delete(
   "/remove/:productId",
   authenticateToken,
@@ -2461,9 +2401,9 @@ class NodemailerEmailService {
     });
   }
   formatPrice(price) {
-    return new Intl.NumberFormat("en-IN", {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "INR"
+      currency: "USD"
     }).format(price);
   }
   generateOrderEmailTemplate(orderData, type, trackingNumber) {
@@ -2897,54 +2837,6 @@ router$9.get(
   }
 );
 router$9.get(
-  "/analytics",
-  authenticateToken,
-  requireAdmin,
-  async (req, res) => {
-    try {
-      if (!getConnectionStatus()) {
-        res.status(503).json({ error: "Database connection required" });
-        return;
-      }
-      const totalOrders = await OrderModel.countDocuments();
-      const totalRevenue = await OrderModel.aggregate([
-        { $match: { paymentStatus: "paid" } },
-        { $group: { _id: null, total: { $sum: "$total" } } }
-      ]);
-      const ordersByStatus = await OrderModel.aggregate([
-        { $group: { _id: "$status", count: { $sum: 1 } } }
-      ]);
-      const recentOrders = await OrderModel.find().populate("user", "name email").sort({ createdAt: -1 }).limit(10).select("orderNumber total status createdAt user");
-      const sixMonthsAgo = /* @__PURE__ */ new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-      const ordersByMonth = await OrderModel.aggregate([
-        { $match: { createdAt: { $gte: sixMonthsAgo } } },
-        {
-          $group: {
-            _id: {
-              year: { $year: "$createdAt" },
-              month: { $month: "$createdAt" }
-            },
-            count: { $sum: 1 },
-            revenue: { $sum: "$total" }
-          }
-        },
-        { $sort: { "_id.year": 1, "_id.month": 1 } }
-      ]);
-      res.json({
-        totalOrders,
-        totalRevenue: totalRevenue[0]?.total || 0,
-        ordersByStatus,
-        recentOrders,
-        ordersByMonth
-      });
-    } catch (error) {
-      console.error("Get order analytics error:", error);
-      res.status(500).json({ error: "Failed to fetch order analytics" });
-    }
-  }
-);
-router$9.get(
   "/:orderId",
   authenticateToken,
   async (req, res) => {
@@ -3079,6 +2971,77 @@ router$9.put(
     } catch (error) {
       console.error("Update order tracking error:", error);
       res.status(500).json({ error: "Failed to update order tracking" });
+    }
+  }
+);
+router$9.get(
+  "/:orderId",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      if (!getConnectionStatus()) {
+        res.status(503).json({ error: "Database connection required" });
+        return;
+      }
+      const order = await OrderModel.findById(orderId).populate("user", "name email phone").populate("items.product", "name price images slug").select("-__v");
+      if (!order) {
+        res.status(404).json({ error: "Order not found" });
+        return;
+      }
+      res.json({ order });
+    } catch (error) {
+      console.error("Get order details error:", error);
+      res.status(500).json({ error: "Failed to fetch order details" });
+    }
+  }
+);
+router$9.get(
+  "/analytics",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      if (!getConnectionStatus()) {
+        res.status(503).json({ error: "Database connection required" });
+        return;
+      }
+      const totalOrders = await OrderModel.countDocuments();
+      const totalRevenue = await OrderModel.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        { $group: { _id: null, total: { $sum: "$total" } } }
+      ]);
+      const ordersByStatus = await OrderModel.aggregate([
+        { $group: { _id: "$status", count: { $sum: 1 } } }
+      ]);
+      const recentOrders = await OrderModel.find().populate("user", "name email").sort({ createdAt: -1 }).limit(10).select("orderNumber total status createdAt user");
+      const sixMonthsAgo = /* @__PURE__ */ new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      const ordersByMonth = await OrderModel.aggregate([
+        { $match: { createdAt: { $gte: sixMonthsAgo } } },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            count: { $sum: 1 },
+            revenue: { $sum: "$total" }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ]);
+      res.json({
+        totalOrders,
+        totalRevenue: totalRevenue[0]?.total || 0,
+        ordersByStatus,
+        recentOrders,
+        ordersByMonth
+      });
+    } catch (error) {
+      console.error("Get order analytics error:", error);
+      res.status(500).json({ error: "Failed to fetch order analytics" });
     }
   }
 );

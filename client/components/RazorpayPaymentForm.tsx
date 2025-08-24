@@ -240,14 +240,14 @@ export default function RazorpayPaymentForm({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
-        <CardTitle className="flex items-center justify-center gap-2 text-lg sm:text-xl">
+        <CardTitle className="flex items-center justify-center gap-2">
           <CreditCard className="w-5 h-5 text-blue-600" />
           Complete Payment
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 sm:space-y-6">
+      <CardContent className="space-y-6">
         {/* Billing Details */}
         <div className="space-y-4">
           <h3 className="font-semibold text-slate-900">Billing Details</h3>
@@ -306,7 +306,7 @@ export default function RazorpayPaymentForm({
         <Button
           onClick={handlePayment}
           disabled={isProcessing || loading || !billingDetails.name || !billingDetails.email || !billingDetails.contact}
-          className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
         >
           {isProcessing ? (
             <div className="flex items-center gap-2">

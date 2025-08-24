@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
-import { Mail, Lock, User, UserPlus } from "lucide-react";
+import { Mail, Lock, User, UserPlus, Chrome } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 
 export default function Register() {
@@ -49,32 +49,32 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 sm:space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <Link to="/" className="inline-flex items-center space-x-2 mb-4 sm:mb-6">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-base sm:text-lg">K</span>
+          <Link to="/" className="inline-flex items-center space-x-2 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">B</span>
             </div>
-            <span className="text-xl sm:text-2xl font-bold text-slate-900">
+            <span className="text-2xl font-bold text-slate-900">
               Kiti Locks
             </span>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">
             Create account
           </h1>
-          <p className="text-sm sm:text-base text-slate-600">
+          <p className="text-slate-600">
             Join us to start shopping for premium bathroom hardware
           </p>
         </div>
 
-        <Card className="border-0 shadow-xl mx-auto">
-          <CardHeader className="space-y-1 pb-4 px-4 sm:px-6">
-            <CardTitle className="text-xl sm:text-2xl text-center font-semibold">
+        <Card className="border-0 shadow-xl">
+          <CardHeader className="space-y-1 pb-4">
+            <CardTitle className="text-2xl text-center font-semibold">
               Sign up
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
+          <CardContent className="space-y-6">
             {/* Google OAuth Button */}
             <div className="w-full">
               <GoogleLogin
@@ -114,21 +114,21 @@ export default function Register() {
 
             {error && (
               <Alert variant="destructive">
-                <AlertDescription className="text-sm">{error}</AlertDescription>
+                <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm sm:text-base">Full name</Label>
+                <Label htmlFor="name">Full name</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-5 sm:h-5" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <Input
                     id="name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="pl-10 sm:pl-11 h-11 sm:h-12 text-sm sm:text-base"
+                    className="pl-10 h-12"
                     placeholder="Enter your full name"
                     required
                     disabled={loading}
@@ -137,15 +137,15 @@ export default function Register() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm sm:text-base">Email address</Label>
+                <Label htmlFor="email">Email address</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-5 sm:h-5" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 sm:pl-11 h-11 sm:h-12 text-sm sm:text-base"
+                    className="pl-10 h-12"
                     placeholder="Enter your email"
                     required
                     disabled={loading}
@@ -154,15 +154,15 @@ export default function Register() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-5 sm:h-5" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <Input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 sm:pl-11 h-11 sm:h-12 text-sm sm:text-base"
+                    className="pl-10 h-12"
                     placeholder="Create a password"
                     required
                     disabled={loading}
@@ -172,15 +172,15 @@ export default function Register() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm sm:text-base">Confirm password</Label>
+                <Label htmlFor="confirmPassword">Confirm password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-5 sm:h-5" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 sm:pl-11 h-11 sm:h-12 text-sm sm:text-base"
+                    className="pl-10 h-12"
                     placeholder="Confirm your password"
                     required
                     disabled={loading}
@@ -191,24 +191,24 @@ export default function Register() {
 
               <Button
                 type="submit"
-                className="w-full h-11 sm:h-12 text-sm sm:text-base"
+                className="w-full h-12 text-base"
                 disabled={loading}
               >
                 {loading ? (
                   <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     Creating account...
                   </div>
                 ) : (
                   <>
-                    <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    <UserPlus className="w-5 h-5 mr-2" />
                     Create account
                   </>
                 )}
               </Button>
             </form>
 
-            <div className="text-center text-xs sm:text-sm">
+            <div className="text-center text-sm">
               <span className="text-slate-600">Already have an account? </span>
               <Link
                 to="/login"
@@ -220,7 +220,7 @@ export default function Register() {
           </CardContent>
         </Card>
 
-        <div className="text-center text-xs text-slate-500 px-4">
+        <div className="text-center text-xs text-slate-500">
           <p>
             By creating an account, you agree to our{" "}
             <Link to="/terms" className="text-blue-600 hover:text-blue-500">

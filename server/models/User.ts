@@ -25,7 +25,6 @@ export interface IUser extends Document {
   location?: string;
   googleId?: string;
   isVerified?: boolean;
-  isActive?: boolean;
   preferences?: {
     newsletter: boolean;
     notifications: boolean;
@@ -117,7 +116,6 @@ const userSchema = new Schema<IUser>(
     location: { type: String, trim: true },
     googleId: { type: String, unique: true, sparse: true },
     isVerified: { type: Boolean, default: false },
-    isActive: { type: Boolean, default: true },
     preferences: {
       newsletter: { type: Boolean, default: true },
       notifications: { type: Boolean, default: true },
