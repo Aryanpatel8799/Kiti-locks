@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useWishlist } from "@/contexts/WishlistContext";
 import ProductReviews from "@/components/ProductReviews";
 
 interface Product {
@@ -45,8 +44,6 @@ interface Product {
   status: string;
   featured: boolean;
   tags: string[];
-  averageRating: number;
-  reviewCount: number;
   variants: Array<{
     name: string;
     value: string;
@@ -67,7 +64,6 @@ export default function ProductDetail() {
   >({});
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
-  const { isInWishlist, toggleWishlist } = useWishlist();
 
   useEffect(() => {
     if (slug) {
@@ -184,32 +180,6 @@ export default function ProductDetail() {
     }
   };
 
-  const handleToggleWishlist = async () => {
-    if (!product) return;
-
-    if (!isAuthenticated) {
-      toast.error("Please sign in to add items to your wishlist", {
-        action: {
-          label: "Sign In",
-          onClick: () => (window.location.href = "/login"),
-        },
-      });
-      return;
-    }
-
-    try {
-      await toggleWishlist(product._id);
-      const isInWishlistNow = isInWishlist(product._id);
-      toast.success(
-        isInWishlistNow
-          ? `${product.name} removed from wishlist`
-          : `${product.name} added to wishlist!`,
-      );
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update wishlist");
-    }
-  };
-
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity >= 1 && newQuantity <= (product?.stock || 0)) {
       setQuantity(newQuantity);
@@ -280,9 +250,9 @@ export default function ProductDetail() {
           <span className="text-slate-900">{product.name}</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Images */}
-          <div className="space-y-3 lg:space-y-4">
+          <div className="space-y-4">
             {/* Main Image */}
             <div className="aspect-square rounded-lg overflow-hidden bg-slate-100">
               {product.images.length > 0 ? (
@@ -300,12 +270,12 @@ export default function ProductDetail() {
 
             {/* Thumbnail Images */}
             {product.images.length > 1 && (
-              <div className="flex space-x-2 overflow-x-auto pb-2">
+              <div className="flex space-x-2 overflow-x-auto">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
                       selectedImage === index
                         ? "border-blue-500"
                         : "border-slate-200 hover:border-slate-300"
@@ -336,30 +306,14 @@ export default function ProductDetail() {
                 {product.name}
               </h1>
 
-              {/* Rating */}
+              {/* Rating placeholder */}
               <div className="flex items-center space-x-2 mb-4">
                 <div className="flex text-yellow-400">
                   {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`w-4 h-4 ${
-                        i < Math.round(product.averageRating || 0)
-                          ? "fill-current"
-                          : "text-gray-300"
-                      }`} 
-                    />
+                    <Star key={i} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
-                <span className="text-sm text-slate-600">
-                  {product.averageRating ? (
-                    <>
-                      {product.averageRating.toFixed(1)} 
-                      ({product.reviewCount} {product.reviewCount === 1 ? 'review' : 'reviews'})
-                    </>
-                  ) : (
-                    'No reviews yet'
-                  )}
-                </span>
+                <span className="text-sm text-slate-600">(23 reviews)</span>
               </div>
 
               {/* Price */}
@@ -440,27 +394,25 @@ export default function ProductDetail() {
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Quantity
               </label>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex items-center space-x-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuantityChange(quantity - 1)}
-                    disabled={quantity <= 1}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <span className="w-12 text-center font-medium">{quantity}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuantityChange(quantity + 1)}
-                    disabled={quantity >= product.stock}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-                <span className="text-sm text-slate-600">
+              <div className="flex items-center space-x-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuantityChange(quantity - 1)}
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <span className="w-12 text-center font-medium">{quantity}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuantityChange(quantity + 1)}
+                  disabled={quantity >= product.stock}
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+                <span className="text-sm text-slate-600 ml-4">
                   {product.stock} available
                 </span>
               </div>
@@ -469,26 +421,16 @@ export default function ProductDetail() {
             {/* Add to Cart */}
             <div className="space-y-3">
               <Button
-                className="w-full h-12 text-base sm:text-lg"
+                className="w-full h-12 text-lg"
                 onClick={handleAddToCart}
                 disabled={product.stock === 0}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
               </Button>
-              <Button 
-                variant="outline" 
-                className={`w-full h-12 text-base sm:text-lg ${
-                  isInWishlist(product._id) 
-                    ? "border-red-300 text-red-600 hover:bg-red-50" 
-                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                }`}
-                onClick={handleToggleWishlist}
-              >
-                <Heart className={`w-5 h-5 mr-2 ${
-                  isInWishlist(product._id) ? "fill-current" : ""
-                }`} />
-                {isInWishlist(product._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+              <Button variant="outline" className="w-full h-12">
+                <Heart className="w-5 h-5 mr-2" />
+                Add to Wishlist
               </Button>
             </div>
 

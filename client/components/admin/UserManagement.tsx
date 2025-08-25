@@ -369,8 +369,88 @@ export default function UserManagement({ apiCall }: UserManagementProps) {
         <CardHeader>
           <CardTitle>Users</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
+        <CardContent className="p-3 sm:p-6">
+          {/* Mobile Card Layout */}
+          <div className="block lg:hidden space-y-4">
+            {filteredUsers.map((user) => (
+              <Card key={user._id} className="border shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-gray-900 text-sm sm:text-base">{user.name}</p>
+                          <p className="text-xs sm:text-sm text-gray-500 mt-1">{user.email}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Joined: {new Date(user.createdAt || "").toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex space-x-1 ml-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedUser(user)}
+                            className="p-1 h-8 w-8"
+                          >
+                            <Eye className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditUser(user)}
+                            className="p-1 h-8 w-8"
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="mx-3 sm:mx-auto">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete User</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete {user.name}? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteUser(user._id)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t">
+                        <div className="flex items-center gap-3">
+                          <Badge variant={user.role === "admin" ? "default" : "secondary"} className="text-xs">
+                            {user.role}
+                          </Badge>
+                          <Badge variant={user.isActive ? "default" : "destructive"} className="text-xs">
+                            {user.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden lg:block rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -406,7 +486,7 @@ export default function UserManagement({ apiCall }: UserManagementProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => fetchUserDetails(user._id)}
+                          onClick={() => setSelectedUser(user)}
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -423,7 +503,7 @@ export default function UserManagement({ apiCall }: UserManagementProps) {
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent>
+                          <AlertDialogContent className="mx-3 sm:mx-auto">
                             <AlertDialogHeader>
                               <AlertDialogTitle>Delete User</AlertDialogTitle>
                               <AlertDialogDescription>
@@ -452,8 +532,8 @@ export default function UserManagement({ apiCall }: UserManagementProps) {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-slate-500">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-3">
+              <div className="text-xs sm:text-sm text-slate-500">
                 Showing {((pagination.currentPage - 1) * 10) + 1} to{" "}
                 {Math.min(pagination.currentPage * 10, pagination.totalUsers)} of{" "}
                 {pagination.totalUsers} users
@@ -464,6 +544,7 @@ export default function UserManagement({ apiCall }: UserManagementProps) {
                   size="sm"
                   onClick={() => fetchUsers(pagination.currentPage - 1)}
                   disabled={!pagination.hasPrev}
+                  className="text-xs sm:text-sm"
                 >
                   Previous
                 </Button>
@@ -472,6 +553,7 @@ export default function UserManagement({ apiCall }: UserManagementProps) {
                   size="sm"
                   onClick={() => fetchUsers(pagination.currentPage + 1)}
                   disabled={!pagination.hasNext}
+                  className="text-xs sm:text-sm"
                 >
                   Next
                 </Button>
@@ -483,7 +565,7 @@ export default function UserManagement({ apiCall }: UserManagementProps) {
 
       {/* Edit User Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="mx-3 sm:mx-auto">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
           </DialogHeader>

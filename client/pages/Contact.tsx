@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 import {
   Mail,
   Phone,
   MapPin,
+  Clock,
+  Send,
   MessageCircle,
   HeadphonesIcon,
+  Globe,
+  CheckCircle,
 } from "lucide-react";
 
 export default function Contact() {
@@ -102,10 +111,12 @@ export default function Contact() {
 
   return (
     <>
-      <SEO
-        title="Contact Us - Get In Touch | Kiti Store"
-        description="Contact Kiti Store for premium kitchen hardware support. Email, phone, or visit our showroom. Expert customer service for modular kitchen solutions."
-        keywords="contact Kiti Store, kitchen hardware support, customer service, kitchen hardware dealer contact, modular kitchen help"
+      <SEO 
+        title="Contact Kiti Store - Customer Support & Information"
+        description="Get in touch with Kiti Store for questions about bathroom hardware, kitchen accessories, orders, or customer support. Multiple contact options available including email, phone, and live chat."
+        keywords="contact kiti store, customer support, bathroom hardware support, kitchen accessories help, order support, contact information, customer service"
+        url="https://www.kitistore.com/contact"
+        type="website"
       />
       <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -157,7 +168,7 @@ export default function Contact() {
       {/* Contact Methods */}
       <section className="py-16 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactInfo.map((info, index) => (
               <motion.div
                 key={info.title}
@@ -191,8 +202,11 @@ export default function Contact() {
       </section>
 
       {/* Contact Form & Info */}
-  
-    </div>
+ 
+
+      {/* Location Map Placeholder */}
+      
+      </div>
     </>
   );
 }

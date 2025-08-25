@@ -6,23 +6,21 @@ declare global {
 }
 
 export const loadRazorpay = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     // Check if Razorpay is already loaded
     if (window.Razorpay) {
-      // Razorpay already loaded
-      return resolve(true);
+      resolve(true);
+      return;
     }
 
-    // Loading Razorpay script...
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.onload = () => {
-      // Razorpay script loaded successfully
       resolve(true);
     };
     script.onerror = (error) => {
-      // Failed to load Razorpay script
-      reject(error);
+      console.error("❌ Failed to load Razorpay script:", error);
+      resolve(false);
     };
     document.body.appendChild(script);
   });
@@ -30,6 +28,5 @@ export const loadRazorpay = () => {
 
 export const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_CjxI6ZFqFKX7Xs';
 
-// Razorpay Key ID logged for debugging
 
 export default { loadRazorpay, razorpayKeyId };

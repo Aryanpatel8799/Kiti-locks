@@ -44,8 +44,6 @@ export default function RazorpayPaymentForm({
     contact: customerInfo.contact || "",
   });
 
-  // Payment form initialized with currency and orderId
-  // Used props: currency, orderId
 
   const handlePayment = async () => {
     try {
@@ -97,7 +95,7 @@ export default function RazorpayPaymentForm({
       // Check if we're in demo mode or live mode
       if (orderData.isDemoMode) {
         // Handle demo mode (should not happen in live)
-        // Demo mode detected in live environment
+        console.warn("Demo mode detected in live environment");
         toast.error("Payment gateway is in demo mode");
         return;
       }
@@ -113,8 +111,7 @@ export default function RazorpayPaymentForm({
         order_id: orderData.orderId,
         handler: async (response: any) => {
           try {
-
-
+           
             // Prepare order items from cart or create fallback
             const preparedOrderItems = cartItems && cartItems.length > 0 
               ? cartItems.map(item => ({

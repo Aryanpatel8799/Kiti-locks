@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import SEO from "@/components/SEO";
 import {
   Heart,
   ShoppingCart,
@@ -19,7 +20,6 @@ import {
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
-import SEO from "@/components/SEO";
 
 interface Product {
   _id: string;
@@ -63,18 +63,15 @@ export default function Index() {
 
   const fetchHomeData = async () => {
     try {
-      // Fetching home data...
 
       // Test API connectivity first
       try {
         const pingRes = await fetch("/api/ping");
         if (pingRes.ok) {
-          await pingRes.json(); // API connectivity test passed
+          const pingData = await pingRes.json();
         } else {
-          // API ping failed with status
         }
       } catch (pingError) {
-        // API ping failed
       }
 
       // Mock data fallback for demo purposes
@@ -165,14 +162,16 @@ export default function Index() {
         const productsRes = await fetch("/api/products?featured=true&limit=8");
         if (productsRes.ok) {
           productsData = await productsRes.json();
-          // Products data loaded successfully
           setFeaturedProducts(productsData.products || mockProducts);
         } else {
-          // Products API returned non-ok status, using mock data
+          console.warn(
+            "Products API returned non-ok status, using mock data:",
+            productsRes.status,
+          );
           setFeaturedProducts(mockProducts);
         }
       } catch (productsError) {
-        // Products fetch error, using mock data
+        console.error("Products fetch error, using mock data:", productsError);
         setFeaturedProducts(mockProducts);
       }
 
@@ -182,18 +181,23 @@ export default function Index() {
         const categoriesRes = await fetch("/api/categories?featured=true");
         if (categoriesRes.ok) {
           categoriesData = await categoriesRes.json();
-          // Categories data loaded successfully
           setFeaturedCategories(categoriesData.categories || mockCategories);
         } else {
-          // Categories API returned non-ok status, using mock data
+          console.warn(
+            "Categories API returned non-ok status, using mock data:",
+            categoriesRes.status,
+          );
           setFeaturedCategories(mockCategories);
         }
       } catch (categoriesError) {
-        // Categories fetch error, using mock data
+        console.error(
+          "Categories fetch error, using mock data:",
+          categoriesError,
+        );
         setFeaturedCategories(mockCategories);
       }
     } catch (error) {
-      // Error fetching home data
+      console.error("Error fetching home data:", error);
       // Set fallback data for demo
       setFeaturedProducts([]);
       setFeaturedCategories([]);
@@ -256,26 +260,14 @@ export default function Index() {
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
 
-  const homeStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Kiti Store",
-    "url": "https://kitistore.com",
-    "description": "Premium modular kitchen hardware manufacturer in India",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://kitistore.com/products?search={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  };
-
   return (
     <>
-      <SEO
-        title="Kiti Store – Premium Modular Kitchen Hardware India"
-        description="Explore luxury kitchen hardware by Kiti Store – Hydraulic Hinges, Soft-Close Channels, Lift-Up Systems & more. Premium modular kitchen solutions for Indian homes."
-        keywords="kitchen hardware, modular kitchen India, soft close channels, lift up hardware, Kiti Store, Khuntia Enterprises, hydraulic hinges, premium kitchen accessories"
-        structuredData={homeStructuredData}
+      <SEO 
+        title="Kiti Store - Premium Bathroom Hardware & Kitchen Accessories"
+        description="Discover premium bathroom hardware, kitchen accessories, door locks, and home improvement products at Kiti Store. Quality hardware solutions for modern homes with fast delivery across India."
+        keywords="bathroom hardware, kitchen accessories, door locks, cabinet handles, drawer slides, hinges, bathroom fittings, premium hardware, home improvement, kiti store, bathroom accessories, kitchen hardware, soft close hinges, cabinet hardware, drawer systems"
+        url="https://www.kitistore.com"
+        type="website"
       />
       <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -728,7 +720,7 @@ export default function Index() {
           </motion.div>
         </div>
       </section>
-    </div>
+      </div>
     </>
   );
 }

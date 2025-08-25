@@ -54,17 +54,19 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <HelmetProvider>
-        <GoogleOAuthProvider clientId={googleClientId}>
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <HelmetProvider>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
+              <Toaster />
+              <Sonner />
               <BrowserRouter>
+                <PerformanceMonitor />
                 <ErrorBoundary>
-                  <PerformanceMonitor />
                   <AuthProvider>
                     <CartProvider>
                       <WishlistProvider>
-                        <Routes>
+                      <Routes>
                         {/* Auth routes - no layout */}
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
@@ -130,10 +132,8 @@ const App = () => {
             </BrowserRouter>
           </TooltipProvider>
         </QueryClientProvider>
+        </HelmetProvider>
       </GoogleOAuthProvider>
-      <Toaster />
-      <Sonner />
-      </HelmetProvider>
     </ErrorBoundary>
   );
 };

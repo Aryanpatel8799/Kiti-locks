@@ -9,6 +9,16 @@
     font-display: swap;
   }
 
+  /* Scrollbar hiding utilities for mobile responsive design */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Shimmer animation for loading skeletons */
   @keyframes shimmer {
     0% {
@@ -187,6 +197,14 @@
   @supports not (backdrop-filter: blur(8px)) {
     .backdrop-blur-sm {
       background-color: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  /* Touch-friendly tap targets */
+  @media (max-width: 640px) {
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
     }
   }
 }

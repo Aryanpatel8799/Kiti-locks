@@ -227,56 +227,56 @@ export const InventoryAlerts = ({ alerts, loading = false }: InventoryAlertsProp
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center">
-          <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
-          Inventory Alerts
-          <Badge variant="secondary" className="ml-2">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg font-semibold flex items-center">
+          <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 mr-2 flex-shrink-0" />
+          <span className="truncate">Inventory Alerts</span>
+          <Badge variant="secondary" className="ml-2 text-xs flex-shrink-0">
             {alerts.length}
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2 max-h-96 overflow-y-auto">
+      <CardContent className="p-3 sm:p-6 pt-0">
+        <div className="space-y-2 max-h-72 sm:max-h-96 overflow-y-auto">
           {alerts.slice(0, 10).map((alert) => {
             const alertLevel = getAlertLevel(alert.stock);
             return (
               <div
                 key={alert._id}
-                className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                className="flex items-center justify-between p-2 sm:p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center">
-                    <h4 className="font-medium text-slate-900 truncate">
+                    <h4 className="font-medium text-sm sm:text-base text-slate-900 truncate">
                       {alert.name}
                     </h4>
                     <Badge
                       variant={alertLevel.color === "red" ? "destructive" : "secondary"}
-                      className="ml-2 text-xs"
+                      className="ml-2 text-xs flex-shrink-0"
                     >
                       {alertLevel.label}
                     </Badge>
                   </div>
-                  <div className="flex items-center text-sm text-slate-500 mt-1">
+                  <div className="flex items-center text-xs sm:text-sm text-slate-500 mt-1">
                     <span>Stock: {alert.stock}</span>
                     {alert.category && (
                       <>
-                        <span className="mx-2">•</span>
-                        <span>{alert.category.name}</span>
+                        <span className="mx-1 sm:mx-2">•</span>
+                        <span className="truncate">{alert.category.name}</span>
                       </>
                     )}
                     {alert.daysUntilOutOfStock && (
                       <>
-                        <span className="mx-2">•</span>
-                        <span className="text-red-600">
+                        <span className="mx-1 sm:mx-2">•</span>
+                        <span className="text-red-600 flex-shrink-0">
                           {alert.daysUntilOutOfStock} days left
                         </span>
                       </>
                     )}
                   </div>
                 </div>
-                <div className="text-right ml-4">
-                  <div className="text-sm font-medium text-slate-900">
+                <div className="text-right ml-2 sm:ml-4 flex-shrink-0">
+                  <div className="text-xs sm:text-sm font-medium text-slate-900">
                     ₹{alert.price.toLocaleString()}
                   </div>
                   {alert.recommendedReorder && (
@@ -330,29 +330,29 @@ export const QuickActions = ({ actions }: QuickActionsProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+    <Card className="h-fit">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg font-semibold">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid gap-3 md:grid-cols-2">
+      <CardContent className="p-3 sm:p-6 pt-0">
+        <div className="grid gap-2 sm:gap-3">
           {actions.map((action, index) => (
             <button
               key={index}
               onClick={action.onClick}
-              className={`${colorClasses[action.color]} border rounded-lg p-4 text-left transition-colors cursor-pointer group`}
+              className={`${colorClasses[action.color]} border rounded-lg p-3 sm:p-4 text-left transition-colors cursor-pointer group w-full`}
             >
               <div className="flex items-start">
-                <div className={`w-8 h-8 rounded-lg ${colorClasses[action.color]} border flex items-center justify-center mr-3 group-hover:scale-110 transition-transform`}>
-                  <div className={`w-4 h-4 ${iconColors[action.color]}`}>
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${colorClasses[action.color]} border flex items-center justify-center mr-2 sm:mr-3 group-hover:scale-110 transition-transform flex-shrink-0`}>
+                  <div className={`w-3 h-3 sm:w-4 sm:h-4 ${iconColors[action.color]}`}>
                     {action.icon}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-slate-900 group-hover:text-slate-700">
+                  <h4 className="font-medium text-sm sm:text-base text-slate-900 group-hover:text-slate-700 truncate">
                     {action.title}
                   </h4>
-                  <p className="text-sm text-slate-600 mt-1">
+                  <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1 line-clamp-2">
                     {action.description}
                   </p>
                 </div>

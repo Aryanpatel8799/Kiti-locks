@@ -82,8 +82,8 @@ export default function Categories() {
         categoriesWithProducts,
       });
     } catch (error) {
-      // Error fetching categories - show toast instead
-      toast.error("Failed to load categories. Please try again.");
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to load categories");
     } finally {
       setLoading(false);
     }

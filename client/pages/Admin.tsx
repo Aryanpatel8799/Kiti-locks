@@ -139,6 +139,7 @@ export default function Admin() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
@@ -743,7 +744,7 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-3 sm:py-4 lg:py-6">
         {/* Enhanced Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -808,21 +809,21 @@ export default function Admin() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8"
         >
           <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200">
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-4 lg:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-600 mb-1">Total Products</p>
-                  <p className="text-2xl font-semibold text-gray-900">{stats.totalProducts}</p>
-                  <div className="flex items-center mt-2">
-                    <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                    <span className="text-sm text-green-600 font-medium">+12% this month</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-blue-600 mb-1 truncate">Total Products</p>
+                  <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">{stats.totalProducts}</p>
+                  <div className="flex items-center mt-1 sm:mt-2">
+                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 mr-1 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-green-600 font-medium truncate">+12% this month</span>
                   </div>
                 </div>
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <Package className="w-5 h-5 text-gray-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                  <Package className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                 </div>
               </div>
             </CardContent>
@@ -889,51 +890,51 @@ export default function Admin() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <Tabs defaultValue="dashboard" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
             <Card className="border-0 shadow-lg">
               <CardContent className="p-6">
-                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 bg-gray-100 p-1 rounded-lg gap-1">
+                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 bg-gray-100 p-1 rounded-lg gap-0.5 sm:gap-1 overflow-x-auto">
                   <TabsTrigger 
                     value="dashboard" 
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm px-1.5 sm:px-3 py-2 min-w-0"
                   >
-                    <BarChart3 className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Dashboard</span>
+                    <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="hidden xs:inline ml-1 sm:ml-2 truncate">Dashboard</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="products"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm px-1.5 sm:px-3 py-2 min-w-0"
                   >
-                    <Package className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Products</span>
+                    <Package className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="hidden xs:inline ml-1 sm:ml-2 truncate">Products</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="categories"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm px-1.5 sm:px-3 py-2 min-w-0"
                   >
-                    <Settings className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Categories</span>
+                    <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="hidden xs:inline ml-1 sm:ml-2 truncate">Categories</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="inventory"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm px-1.5 sm:px-3 py-2 min-w-0 hidden lg:flex"
                   >
-                    <Package className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Inventory</span>
+                    <Package className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="hidden xs:inline ml-1 sm:ml-2 truncate">Inventory</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="users"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm px-1.5 sm:px-3 py-2 min-w-0 hidden lg:flex"
                   >
-                    <Users className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Users</span>
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="hidden xs:inline ml-1 sm:ml-2 truncate">Users</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="orders"
-                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm px-1.5 sm:px-3 py-2 min-w-0 hidden lg:flex"
                   >
-                    <ShoppingCart className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Orders</span>
+                    <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="hidden xs:inline ml-1 sm:ml-2 truncate">Orders</span>
                   </TabsTrigger>
                 </TabsList>
               </CardContent>
@@ -946,7 +947,7 @@ export default function Admin() {
                 <AnalyticsDashboard apiCall={apiCall} />
                 
                 {/* Original Dashboard Components */}
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-4 sm:gap-6 lg:grid-cols-2 xl:grid-cols-2">
                   <InventoryAlerts 
                     alerts={inventoryAlerts?.map(product => ({
                       ...product,
@@ -961,6 +962,7 @@ export default function Admin() {
                         description: "Create a new product listing",
                         icon: <Package className="w-4 h-4" />,
                         onClick: () => {
+                          setActiveTab("products");
                           resetProductForm();
                           setIsProductDialogOpen(true);
                         },
@@ -971,9 +973,7 @@ export default function Admin() {
                         description: "Check recent orders and status",
                         icon: <ShoppingCart className="w-4 h-4" />,
                         onClick: () => {
-                          const tabsList = document.querySelector('[role="tablist"]');
-                          const ordersTab = tabsList?.querySelector('[value="orders"]') as HTMLElement;
-                          ordersTab?.click();
+                          setActiveTab("orders");
                         },
                         color: "green",
                       },
@@ -982,9 +982,7 @@ export default function Admin() {
                         description: "View and manage user accounts",
                         icon: <Users className="w-4 h-4" />,
                         onClick: () => {
-                          const tabsList = document.querySelector('[role="tablist"]');
-                          const usersTab = tabsList?.querySelector('[value="users"]') as HTMLElement;
-                          usersTab?.click();
+                          setActiveTab("users");
                         },
                         color: "yellow",
                       },
@@ -993,9 +991,7 @@ export default function Admin() {
                         description: "Monitor stock levels and alerts",
                         icon: <Package className="w-4 h-4" />,
                         onClick: () => {
-                          const tabsList = document.querySelector('[role="tablist"]');
-                          const inventoryTab = tabsList?.querySelector('[value="inventory"]') as HTMLElement;
-                          inventoryTab?.click();
+                          setActiveTab("inventory");
                         },
                         color: "red",
                       },

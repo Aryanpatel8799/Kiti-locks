@@ -194,9 +194,9 @@ export default function Cart() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+          <div className="xl:col-span-2 space-y-4 lg:space-y-6">
             <Card className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
               <CardHeader className="bg-gray-900 text-white p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
@@ -225,9 +225,9 @@ export default function Cart() {
                     key={item.product._id}
                     className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0"
                   >
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col lg:flex-row lg:items-start gap-4 lg:gap-6">
                       {/* Product Image */}
-                      <div className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 bg-gray-100 rounded-lg overflow-hidden shadow-sm mx-auto sm:mx-0">
+                      <div className="flex-shrink-0 w-full sm:w-32 lg:w-28 h-32 lg:h-28 bg-gray-100 rounded-lg overflow-hidden shadow-sm">
                         {item.product && item.product.images && item.product.images.length > 0 ? (
                           <img
                             src={item.product.images[0]}
@@ -236,7 +236,7 @@ export default function Cart() {
                           />
                         ) : (
                           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-xs text-gray-500 font-medium">No Image</span>
+                            <span className="text-sm text-gray-500 font-medium">No Image</span>
                           </div>
                         )}
                       </div>
@@ -246,10 +246,10 @@ export default function Cart() {
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0">
                           <div className="flex-1 pr-4">
                             <div className="relative">
-                              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-gray-700 transition-colors">
+                              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-gray-700 transition-colors">
                                 {item.product ? item.product.name : "Unknown Product"}
                               </h3>
-                              <div className="flex flex-wrap items-center gap-2 mb-3">
+                              <div className="flex items-center gap-2 mb-3">
                                 <Badge variant="outline" className="text-xs bg-gray-50 border-gray-200 text-gray-700">
                                   {item.product && item.product.category ? item.product.category.name : "Unknown Category"}
                                 </Badge>
@@ -366,7 +366,7 @@ export default function Cart() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1">
+          <div className="xl:col-span-1">
             <Card className="sticky top-4 bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
               <CardHeader className="bg-gray-900 text-white p-6">
                 <CardTitle className="text-xl sm:text-2xl font-semibold">Order Summary</CardTitle>
