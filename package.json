@@ -17,7 +17,7 @@
     "build:server": "vite build --config vite.config.server.ts",
     "prerender": "node scripts/prerender.js",
     "prerender:static": "node scripts/prerender-static.js",
-    "generate:sitemap": "tsx scripts/generate-sitemap.ts",
+    "generate:sitemap": "node scripts/generate-sitemap.js",
     "build:production": "NODE_ENV=production npm run build",
     "build:seo": "npm run build && npm run prerender:static",
     "start": "node dist/server/node-build.mjs",
@@ -38,7 +38,7 @@
     "seed": "tsx server/scripts/seed.ts",
     "audit:security": "npm audit --audit-level high",
     "audit:bundle": "npx bundle-analyzer dist/spa/assets/*.js",
-    "seo:sitemap": "tsx scripts/generate-sitemap.ts",
+    "seo:sitemap": "node scripts/generate-sitemap.js",
     "seo:audit": "npx lighthouse http://localhost:8080 --only-categories=seo --output html --output-path ./reports/seo-audit.html",
     "prebuild": "npm run seo:sitemap"
   },

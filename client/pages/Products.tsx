@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import SEO from "@/components/SEO";
 import {
   Select,
   SelectContent,
@@ -757,7 +758,15 @@ export default function Products() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <SEO 
+        title="Products - Browse Premium Bathroom Hardware & Kitchen Accessories"
+        description="Shop our complete collection of premium bathroom hardware, kitchen accessories, door locks, and home improvement products. Find quality hardware solutions with competitive prices and fast delivery."
+        keywords="products, bathroom hardware, kitchen accessories, door locks, cabinet handles, drawer slides, hinges, premium hardware, home improvement products, buy online"
+        url="https://www.kitistore.com/products"
+        type="website"
+      />
+      <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Search and Controls */}
         <motion.div 
@@ -1345,6 +1354,7 @@ export default function Products() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
